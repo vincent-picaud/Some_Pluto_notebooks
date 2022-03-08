@@ -4,3 +4,13 @@ Some [[https://github.com/fonsp/Pluto.jl][Pluto]] notebooks with the aim of illu
 See [[https://vincent-picaud.github.io/Some_Pluto_notebooks][notebook list]].
 
 The template I use is [[https://juliapluto.github.io/static-export-template/][here]].
+
+* Table of contents
+
+** Misc
+
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Pluto_tips.html][Pluto_tips]] :: some tips related to Pluto notebooks.
+
+** Spectrometry
+
+- [[file:snip.html][snip.jl]] :: compute baseline using the SNIP algorithm.
