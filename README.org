@@ -1,0 +1,6 @@
+#+title: Some Pluto notebooks (Julia language)
+
+Some [[https://github.com/fonsp/Pluto.jl][Pluto]] notebooks with the aim of illustrating various algorithms.
+See [[https://vincent-picaud.github.io/Some_Pluto_notebooks][notebook list]].
+
+The template I use is [[https://juliapluto.github.io/static-export-template/][here]].
