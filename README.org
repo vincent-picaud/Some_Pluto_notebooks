@@ -13,4 +13,4 @@ The template I use is [[https://juliapluto.github.io/static-export-template/][he
 
 ** Spectrometry
 
-- [[file:snip.html][snip.jl]] :: compute baseline using the SNIP algorithm.
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/snip.html][snip.jl]] :: compute baseline using the SNIP algorithm.

@@ -33,9 +33,6 @@ md"""
 Although it works well in practice, AFAIK there is no real theory behind this algorithm.
 """
 
-# ╔═╡ decbe68b-2973-4078-b887-f9781420621c
-# @bind current_halfwindow Slider(1:10)
-
 # ╔═╡ b7989e08-8fd5-4d97-9351-ba7a958fb5e1
 md"""
 **TODO:** provide some explaination about the algorithm
@@ -1316,7 +1313,6 @@ version = "3.5.0+0"
 # ╟─2a5ce96d-c724-4382-8298-3c2c3197b00c
 # ╟─e7cb0d73-2eb3-49be-aa3c-3e869431b41d
 # ╟─1b6ee4dd-7949-4a14-998f-d68b4beb85d5
-# ╠═decbe68b-2973-4078-b887-f9781420621c
 # ╟─b7989e08-8fd5-4d97-9351-ba7a958fb5e1
 # ╠═88c41862-2ec3-455d-b82b-985e8dab2a08
 # ╟─152cf63a-79f0-4fc2-b1f3-0ceef30d85bc
