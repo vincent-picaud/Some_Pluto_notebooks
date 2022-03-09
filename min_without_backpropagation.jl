@@ -8,6 +8,7 @@ using InteractiveUtils
 begin
 	using WGLMakie
 	using ForwardDiff
+	using PlutoUI
 end	
 
 # ╔═╡ e12ba51c-8ffb-470d-b682-54d15c31740c
@@ -18,6 +19,9 @@ md"""
 
     This is a simple gradient descent not using backpropagation but a random direction
 """
+
+# ╔═╡ 1ddf9447-c96a-4245-b46c-006dc3d82d42
+PlutoUI.TableOfContents(aside=true)
 
 # ╔═╡ 9158c15e-7c02-4bda-8d6a-ed8b7561cc99
 md"""
@@ -93,10 +97,12 @@ end
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 
 [compat]
 ForwardDiff = "~0.10.25"
+PlutoUI = "~0.7.37"
 WGLMakie = "~0.5.4"
 """
 
@@ -112,6 +118,12 @@ deps = ["ChainRulesCore", "LinearAlgebra"]
 git-tree-sha1 = "6f1d9bc1c08f9f4a8fa92e3ea3cb50153a1b40d4"
 uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 version = "1.1.0"
+
+[[deps.AbstractPlutoDingetjes]]
+deps = ["Pkg"]
+git-tree-sha1 = "8eaf9f1b4921132a4cff3f36a1d9ba923b14a481"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+version = "1.1.4"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "03e0550477d86222521d254b741d470ba17ea0b5"
@@ -490,6 +502,17 @@ deps = ["Test"]
 git-tree-sha1 = "8d511d5b81240fc8e6802386302675bdf47737b9"
 uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
 version = "0.0.4"
+
+[[deps.HypertextLiteral]]
+git-tree-sha1 = "2b078b5a615c6c0396c77810d92ee8c6f470d238"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.3"
+
+[[deps.IOCapture]]
+deps = ["Logging", "Random"]
+git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
+uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
+version = "0.2.2"
 
 [[deps.IfElse]]
 git-tree-sha1 = "debdd00ffef04665ccbb3e150747a77560e8fad1"
@@ -943,6 +966,12 @@ git-tree-sha1 = "6f1b25e8ea06279b5689263cc538f51331d7ca17"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.1.3"
 
+[[deps.PlutoUI]]
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
+git-tree-sha1 = "bf0a1121af131d9974241ba53f601211e9303a9e"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.37"
+
 [[deps.PolygonOps]]
 git-tree-sha1 = "77b3d3605fc1cd0b42d95eba87dfcd2bf67d5ff6"
 uuid = "647866c9-e3ac-4575-94e7-e3d426903924"
@@ -1363,6 +1392,7 @@ version = "3.5.0+0"
 # ╔═╡ Cell order:
 # ╟─e12ba51c-8ffb-470d-b682-54d15c31740c
 # ╠═9556e21a-22eb-4000-a341-397b011fa60d
+# ╠═1ddf9447-c96a-4245-b46c-006dc3d82d42
 # ╠═9158c15e-7c02-4bda-8d6a-ed8b7561cc99
 # ╠═eeb8fa92-9f8d-11ec-2edf-fda09d802ef7
 # ╠═cc2e3332-c6aa-4619-af4d-84f401410463
