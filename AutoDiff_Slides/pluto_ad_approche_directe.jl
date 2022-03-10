@@ -35,7 +35,7 @@ On se concentre sur le mode direct et l'on cherche un moyen commode de réaliser
 
 Il suffit de regarder ce qu'il se passe pour $\Phi\circ\varphi$ où $\Phi:\mathbb{R}^n\rightarrow\mathbb{R}$ et $\varphi:\mathbb{R}^m\rightarrow\mathbb{R}^n$
 
-La règle de la chaine conduit à:
+La règle de la chaine conduit à :
 ```math
 \begin{align}
 \mathrm{d}(\Phi\circ\varphi) &= \sum_{i=1}^m \partial_i (\Phi\circ\phi) \mathrm{d}^ix \\
@@ -48,15 +48,15 @@ La règle de la chaine conduit à:
 On rappelle que pour une application $\Phi: \mathbb{R}^m\rightarrow\mathbb{R}$, alors $\mathrm{d}\Phi$ est une forme linéaire de $\mathbb{R}^m$ sur $\mathbb{R}$. La base (duale) de cet espace est constituée des **covecteurs** $\mathrm{d}^i$, projections de $x\in\mathbb{R}^m$ sur sa i-èm composante, soit $x^i$. 
 
 !!! exemple "Tutorial... les dx, dy... etc"
-    Soient $X=\left(\begin{array}{c}a\\b\end{array}\right)\in\mathbb{R}^2$ et les 		application coordonnées $\mathrm{p}^i$ : $\mathrm{p}^1(X)=a$ et 					$\mathrm{p}^2(X)=b$. Ceci s'écrit:
+    Soient $X=\left(\begin{array}{c}a\\b\end{array}\right)\in\mathbb{R}^2$ et les 		applications coordonnées $\mathrm{p}^i$ : $\mathrm{p}^1(X)=a$ et 					$\mathrm{p}^2(X)=b$. Ceci s'écrit :
 	```math
 	\mathrm{p}^1(X)=(1,\  0)\cdot X,\ \ \mathrm{p}^2(X)=(0,\ 1)\cdot X,\      			\mathrm{remarque}\ \mathrm{p}(X)=\mathrm{Id}\cdot X
 	```
-    Ce sont des applications linéraires, donc:
+    Ce sont des applications linéaires, donc :
 	```math
 	\mathrm{dp}^1=(1,\  0),\ \ \mathrm{dp}^2=(0,\ 1),\ \mathrm{dp}=\mathrm{Id}
 	```
-    Si l'on considère $f:\mathbb{R}^2\rightarrow R$, alors:
+    Si l'on considère $f:\mathbb{R}^2\rightarrow R$, alors :
     ```math
 	f(a,b)=f(\mathrm{p}^1(X),\mathrm{p}^2(X))=f\circ \mathrm{p}(X)
     ```
@@ -73,7 +73,7 @@ On rappelle que pour une application $\Phi: \mathbb{R}^m\rightarrow\mathbb{R}$, 
     ... ce qui est traditionnellement noté $\mathrm{d}f = \partial_x f\ \mathrm{d}x + 	\partial_y f\ \mathrm{d}y$ (bien que $\mathrm{d}f = \partial_1 f\ \mathrm{d}^1 	+ 	\partial_2 f\ \mathrm{d}^2$ soit plus correcte), mais dans tous les cas 	**les 		$\mathrm{d}^i$ sont simplement les différentielles des applications 		
 	coordonnées $\mathrm{p}^i$**.
 
-    **Remarque:** la formule du début, $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n 	\partial_j \Phi\ \mathrm{d}\varphi^{\,j}$, est le cas général où les 				$\mathrm{p}^i$ sont remplacées par des applications quelconques $\varphi^i$. 	
+    **Remarque :** la formule du début, $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n 	\partial_j \Phi\ \mathrm{d}\varphi^{\,j}$, est le cas général où les 				$\mathrm{p}^i$ sont remplacées par des applications quelconques $\varphi^i$. 	
 """
 
 # ╔═╡ ed6b55b4-882a-475b-8829-a788fa3d6108
@@ -92,7 +92,7 @@ Les covecteurs $\mathrm{d}x, \mathrm{d}y$ ont pour composantes $(1,0)$ et $(0,1)
 \mathrm{d}(x+\sin(xy)) &\leadsto 1\ (1,0) + 1\ (y\cos(xy),x\cos(xy)) = (1+y\cos(xy),x\cos(xy))\\
 \end{align}
 ```
-On optient le résultat attendu:
+On obtient le résultat attendu :
 ```math
 d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + (y\cos(xy))\mathrm{d}y
 ```
@@ -105,15 +105,15 @@ d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + (y\cos(xy))\mathrm{d}y
 md"""
 # Implémentation jouet
 
-L'implémentation suit exactement le cheminement précédent. A tout scalaire on associe un covecteur. 
+L'implémentation suit exactement le cheminement précédent. À tout scalaire on associe un covecteur. 
 
-En termes d'optimisation, afin d'éviter des allocations dynamiques on utilise un vecteur statique. Si le nombre de variables est trop important on découpe ce vecteur en plusieurs morceaux et on relance les calculs plusieurs fois. 
+En termes d'optimisation, afin d'éviter des allocations dynamiques, on utilise un vecteur statique. Si le nombre de variables est trop important, on découpe ce vecteur en plusieurs morceaux et on relance les calculs plusieurs fois. 
 ```
 """
 
 # ╔═╡ 803d756b-2e35-42f3-ae9f-6798e4d82d27
 md"""
-## Nouveau type de scalaire
+## Nouveau type pour les scalaires
 """
 
 # ╔═╡ 44263ffa-80c0-4657-a625-28b2c19b23a4
@@ -217,7 +217,7 @@ end
 md"""
 ## "Syntactic sugar"
 
-Il s'agit d'encapsuler les procédures précédentes afin de rendre leur usage plus pratique. En particulier il faut connaitre toutes les variables indépendantes dès le début pour être en mesure de les numéroter de $1$ à $N$.
+Il s'agit d'encapsuler les procédures précédentes afin de rendre leur usage plus pratique. En particulier, il faut connaitre toutes les variables indépendantes dès le début pour être en mesure de les numéroter de $1$ à $N$.
 """
 
 # ╔═╡ d773e0db-d442-42aa-83ad-5e3865e2dbf3
@@ -246,20 +246,20 @@ gradient(foo,[2.0, 3.0])
 
 # ╔═╡ bc7a2576-1c57-41d8-aae3-0ca13a1a786a
 md"""
-Vérification: si $z=x+\sin(xy)$, alors $\nabla z = (1+y\cos(xy),x\cos(xy))$. Si $x=2, y=3$ on obtient $z=1.72058$ et $\nabla z=(3.88051,1.92034)$
+Vérification : si $z=x+\sin(xy)$, alors $\nabla z = (1+y\cos(xy),x\cos(xy))$. Si $x=2, y=3$ on obtient $z=1.72058$ et $\nabla z=(3.88051,1.92034)$
 """
 
 # ╔═╡ 6628ad4b-8b16-4aa3-9dfe-50b2a510aecf
 md"""
 ## Derivée directionnelle
 
-Si l'on souhaite calculer une dérivée directionnelle, il est avantageux d'utiliser la formule:
+Si l'on souhaite calculer une dérivée directionnelle, il est avantageux d'utiliser la formule :
 ```math
 \nabla f\cdot d = \frac{d}{dt}(t\rightarrow f(X+t d))_{|t=0}
 ```
 En effet, la seule variable à definir de type `ADVar` est $t$.
 
-**Note:** dans l'approche utilisant une "cassette" d'enregistrement, cette astuce n'a pas d'intéret, car il suffit de prendre $v=d$ à la place de $v=e_i$.
+**Note :** dans l'approche utilisant une "cassette" d'enregistrement, cette astuce n'a pas d'intérêt, car il suffit de prendre $v=d$ à la place de $v=e_i$.
 """
 
 # ╔═╡ ec41a684-2075-4a89-b9b1-aa361640f180
@@ -310,7 +310,7 @@ H =
 \end{array}
 \right)
 ```
-En $x=2, y=3$, on trouve:
+En $x=2, y=3$, on trouve :
 ```math
 H = 
 \left(
@@ -324,18 +324,18 @@ H =
 
 # ╔═╡ fa1e4f38-a3c4-4178-9769-ca7d5491f8dd
 md"""
-Cela marche, mais **beaucoup de calculs et certains inutiles**. 
+Cela marche, mais **beaucoup de calculs dont certains sont inutiles**. 
 
-En effet, le théorème de Schwarz, nous dit que (si $f$ suffisament lisse):
+En effet, le théorème de Schwarz, nous dit que (si $f$ suffisament lisse) :
 ```math
 \partial^2_{ij}f = \partial^2_{ji}f
 ```
 Donc $1/2N(N-1)$ calculs sont redondants...
 
-Il existe des approches, plus compliquées, qui évitent ces calculs inutiles:
+Il existe des approches, plus compliquées, qui évitent ces calculs inutiles :
 1. R.M. Gower, M.P. Mello, A new framework for the computation of hessians, Optimization Methods and Software. 27 (2012) 251-273. https://doi.org/10.1080/10556788.2011.580098.
 
-2. M. Wang, A. Gebremedhin, A. Pothen, Capitalizing on live variables: New algorithms for efficient hessian computation via automatic differentiation, Mathematical Programming Computation. 8 (2016) 393–433.
+2. M. Wang, A. Gebremedhin, A. Pothen, Capitalizing on live variables : New algorithms for efficient hessian computation via automatic differentiation, Mathematical Programming Computation. 8 (2016) 393–433.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -564,7 +564,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╔═╡ Cell order:
 # ╟─45ee7653-8bdf-472d-aa39-7a5be5f03dbe
 # ╟─841ab7fb-aefb-434d-8d60-db585132dd19
-# ╠═64776627-30c6-4ee1-8df3-6be2829bd9c2
+# ╟─64776627-30c6-4ee1-8df3-6be2829bd9c2
 # ╟─2540688c-81be-4fe7-89b5-9976f44152e8
 # ╟─ed6b55b4-882a-475b-8829-a788fa3d6108
 # ╟─1989ee2c-3dfb-4fcd-862d-71c0f3a868d9
