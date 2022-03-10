@@ -63,7 +63,7 @@ function fgd(f::Function,θ::AbstractVector,η::Real)
 end
 
 # ╔═╡ 53ab660e-8cd5-4151-8073-9284a479f540
-iterate = fgd(f_Beal,Float64[1,0],0.02)
+iterate = fgd(f_Beal,Float64[1,0],0.01)
 
 # ╔═╡ 18ed4b1f-a85e-412e-b24e-711bab54960c
 f_Beal.(eachrow(iterate))

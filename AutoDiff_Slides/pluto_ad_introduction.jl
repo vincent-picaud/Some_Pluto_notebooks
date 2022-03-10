@@ -29,7 +29,7 @@ md"""
 La "différentiation automatique" est un **ensemble** de techniques ayant pour but le calcul efficace des dérivées.
 
 La différentiation automatique **n'est pas** :
-- la differentiation symbolique
+- la différentiation symbolique
 - l'usage des différences finies
 """
 
@@ -37,8 +37,8 @@ La différentiation automatique **n'est pas** :
 md"""
 ## Différentiation symbolique
 
-Non recommandée en général:
-- La coomplexité des expressions croit rapidement
+Non recommandée en général :
+- La complexité des expressions croit rapidement
   ```math
   \begin{align*}
   \left(\frac{f}{g}\right)' &= \frac{g(x) f'(x)-f(x) g'(x)}{g(x)^2} \\
@@ -47,7 +47,7 @@ Non recommandée en général:
   \end{align*}
   ```
   il faut ajouter la lenteur du calcul formel (manipulation d'arbres, heuristiques...)
-- Problématique pour différentier un code général: boucles, branchements etc...
+- Problématique pour différentier un code général : boucles, branchements etc...
 ```julia
 function f(x)
 	if x<0
@@ -63,18 +63,18 @@ end
 md"""
 ## Différences finies
 
-Deux problèmes principaux:
+Deux problèmes principaux :
 - stabilité numérique :
   ```math
   \lim_{h\rightarrow 0}\frac{f(x_0+h)-f(x_0)}{h}
   ```
 
-- inefficace dans le cas multidimensionel $f(x_1,\dots,x_n)$ :
+- inefficace dans le cas multidimensionnel $f(x_1,\dots,x_n)$ :
   ```math
   i=1\dots n,\ \lim_{h\rightarrow 0}\frac{f(x_0+h e_i)-f(x_0)}{h}
   ```
 
-Par contre c'est un moyen commode lors de phase se test/debuggage
+Par contre, c'est un moyen commode lors de phase de test/débogage.
 """
 
 # ╔═╡ 3c9ff7f2-6b4c-4d0a-9bc3-e719504b7f1e
@@ -88,24 +88,24 @@ Il s'agit de calculer $\sin'(1)$ en utilisant
 
 
 
-!!! remark
-    en pratique si l'on doit vraiment utiliser les différences finies, on prend      
+!!! remark "Remarque"
+    En pratique si l'on doit vraiment utiliser les différences finies, on prend      
     $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les `Float64`, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
 """
 
 # ╔═╡ 579249f9-e7d8-4097-b358-7d410a1b0d87
 md"""
-## Differentiation automatique
+## Différentiation automatique
 
-Il y a principalement deux techniques pour mettre en ouvre la différentiation automatique:
+Il y a principalement deux techniques pour mettre en ouvre la différentiation automatique :
 - **surcharge des opérateurs**
 - transformation du code source
 
-Il y a également deux modes de fonctionnement:
+Il y a également deux modes de fonctionnement :
 - mode **forward** 
 - mode **backward**
 
-!!! remark 
+!!! remark "Remarque" 
     pour les dérivations **d'ordre supérieur**, il est possible d'alterner les
 	modes **forward** et **backward**
 """
@@ -120,17 +120,17 @@ md"""
 ## Définition
 
 !!! definition "Différentielle"
-    Une fonction $f$ est differentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire bornée, notée $df_{|x}$, telle que:
+    Une fonction $f$ est différentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire bornée, notée $df_{|x}$, telle que :
     ```math
 	f(x+\delta x) = f(x) + df_{|x}\cdot \delta x + o(\|\delta x\|)
     ```
-    (rappel: $f\in o(g) \Leftrightarrow \lim_{x\rightarrow 0}\frac{\|f(x)\|}{g(x)}=0$)
+    (rappel : $f\in o(g) \Leftrightarrow \lim_{x\rightarrow 0}\frac{\|f(x)\|}{g(x)}=0$)
 
-    Une fonction $f$ est differentiable si elle est différentiable en tout point $x$.
+    Une fonction $f$ est différentiable si elle est différentiable en tout point $x$.
 
-**Retour sur les notations:**
+**Retour sur les notations :**
 
-si $f:\mathbb{R}^m\to\mathbb{R}^n$, alors:
+si $f:\mathbb{R}^m\to\mathbb{R}^n$, alors :
 ```math
 \begin{eqnarray}
  df: \mathbb{R}^m & \to & \mathcal{L}(\mathbb{R}^m,\mathbb{R}^n)\\
@@ -154,28 +154,28 @@ Comme
 \underbrace{\|x+\delta x\|_2^2}_{g(x+\delta x)} =  \underbrace{\|x\|_2^2}_{g(x)} + \underbrace{2 \langle  x,\delta x \rangle}_{dg_{|x}\cdot \delta x}  + \underbrace{\|\delta x\|_2^2}_{o(\|\delta x\|)}}
 ```
 
-La différentielle est donc:
+La différentielle est donc :
 ```math
 dg =  x\mapsto (\delta x \mapsto 2 \langle  x, \delta x \rangle) \in \left(\mathbb{R}^m \to \mathcal{L}(\mathbb{R}^m,\mathbb{R}) \right)
 ```
-La différentielle en $x_0$ est:
+La différentielle en $x_0$ est :
 ```math
 dg_{|x_0} =  \delta x \mapsto 2 \langle  x_0, \delta x \rangle \in \mathcal{L}(\mathbb{R}^m,\mathbb{R})
 ```
-sont action sur le vecteur $\delta x$ est:
+sont action sur le vecteur $\delta x$ est :
 ```math
 dg_{|x_0}\cdot \delta x =  2 \langle  x_0, \delta x \rangle \in \mathbb{R}
 ```
 
 ### Exemple 2
-On considère la fonction affine: $f:x\mapsto M\cdot x + y$. 
+On considère la fonction affine : $f:x\mapsto M\cdot x + y$. 
 
 Comme
 ```math
 \Large{
 \underbrace{M\cdot (x+\delta x)-y}_{f(x+\delta x)} =  \underbrace{M\cdot x -y}_{f(x)} + \underbrace{M\cdot \delta x}_{df_{|x}\cdot \delta x}  + \underbrace{0}_{o(\|\delta x\|)}}
 ```
-la differentielle est l'application constante: 
+la différentielle est l'application constante : 
 ```math
 x\mapsto (\delta x \mapsto M\cdot \delta x) 
 ```
@@ -196,7 +196,7 @@ Il s'agit de trouver la différentielle des fonctions composées
 
 On considère $x\mapsto h(x)=\| M\cdot x - y\|^2_2$. 
 
-Comme $h=g\circ f$ avec $g=\|.\|_2^2$ et $f=M\cdot . -y$, alors:
+Comme $h=g\circ f$ avec $g=\|.\|_2^2$ et $f=M\cdot . -y$, alors :
 
 ```math
 \Large{
@@ -207,7 +207,7 @@ Comme $h=g\circ f$ avec $g=\|.\|_2^2$ et $f=M\cdot . -y$, alors:
 \end{align*}
 }
 ```
-La différentielle de $h$ est donc:
+La différentielle de $h$ est donc :
 ```math
 dh = (x\mapsto (\delta x\mapsto 2 \langle  M\cdot x-y, M\cdot \delta x \rangle))
 ```
@@ -218,10 +218,10 @@ md"""
 ## Gradient
 
 Contrairement à la différentielle, pour définir un gradient il faut un **produit scalaire** (espace de Hilbert). L'existence du gradient
-découle du théorème de représentation de Ritz, qui démontre que toute toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
+découle du théorème de représentation de Ritz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
 
 !!! definition "Vecteur gradient"
-    Pour une fonction differentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Ritz, il existe donc un vector $v_x$ tel 		que:
+    Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Ritz, il existe donc un vecteur $v_x$ tel 		que :
 	```math
 	df_{|x}\cdot \delta x  =\langle v_x , \delta x \rangle
 	```
@@ -229,16 +229,16 @@ découle du théorème de représentation de Ritz, qui démontre que toute toute
 
 ### Exemple
 
-Si l'on revient à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, qui est une application de $\mathbb{R}^m$ dans $\mathbb{R}$, nous avions montré que:
+Si l'on revient à l'exemple : $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, qui est une application de $\mathbb{R}^m$ dans $\mathbb{R}$, nous avions montré que :
 
 ```math
 dh_{|x} = (\delta x\mapsto 2 \langle  M\cdot x-y, M\cdot \delta x \rangle) \in \mathcal{L}(\mathbb{R}^m,\mathbb{R})
 ```
-Cette forme linéaire peut s'écrire:
+Cette forme linéaire peut s'écrire :
 ```math
 dh_{|x} = \delta x\mapsto \langle 2 M^t(M\cdot x-y), \delta x \rangle
 ```
-le gradient est donc:
+le gradient est donc :
 ```math
 \nabla h_{|x} = 2 M^t(M\cdot x-y)
 ```
@@ -262,7 +262,7 @@ J_{|x}=
 ```
 
 !!! example "A retenir..."
-    - Pour obtenir la colonne $j$ de $J$ il suffit de calculer $J\cdot e_j$. Ceci 		permet de calculer en une seul produit la dérivée de toutes les quantités par 		rapport à une seule variable $x_j$:
+    - Pour obtenir la colonne $j$ de $J$ il suffit de calculer $J\cdot e_j$. Ceci 		permet de calculer en un seul produit la dérivée de toutes les quantités par 		rapport à une seule variable $x_j$ :
 	```math
 	\left(
 	\begin{array}{c}
@@ -281,11 +281,11 @@ J_{|x}=
 	\right)
     ```
 
-Cette remarque toute simple permettra de cerner l'interet des modes **forward** et **backward**.
+Cette remarque toute simple permettra de cerner l'intérêt des modes **forward** et **backward**.
 
 ### Exemple
 
-Toujours en revant à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, les composantes de la différentielle (matrice Jacobienne) et le gradient peuvent s'écrire:
+Toujours en revenant à l'exemple : $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, les composantes de la différentielle (matrice Jacobienne) et le gradient peuvent s'écrire :
 
 ```math
 df_{|x}(\delta x) = \underbrace{\left( \partial_1 f_{|x}, \partial_2 f_{|x}, \dots, \partial_m f_{|x} \right)}_J \cdot
@@ -311,11 +311,11 @@ md"""
 
 On souhaite calculer le gradient de $f:(x_1,x_2)\mapsto x_1+\sin(x_1x_2)$.
 
-L'idée est de:
-- décomposer le cacul en étapes élémentaires
+L'idée est de :
+- décomposer le calcul en étapes élémentaires
 - utiliser la règle de la chaine
 
-Ici cela consiste a introduire les fonctions:
+Ici cela consiste à introduire les fonctions :
 ```math
 \Phi_1(x_1,x_2)=
 \left(
@@ -347,7 +347,7 @@ x_3 + x_4
 \end{array}
 \right)
 ```
-de telle sorte que:
+de telle sorte que :
 ```math
 \left(
 \begin{array}{c}
@@ -360,11 +360,11 @@ x_1 x_2 \\
 \right) = F(x_1,x_2) = \Phi_3 \circ \Phi_2 \circ \Phi_1(x_1,x_2)
 ```
 
-La différentielle $dF$ est donnée par:
+La différentielle $dF$ est donnée par :
 ```math
 dF_{|(x_1,x_2)} = (d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)}
 ```
-soit plus explicitement:
+soit plus explicitement :
 ```math
 dF_{|(x_1,x_2)} = 
 \left(
@@ -395,7 +395,7 @@ x_2 & x_1
 \end{array}
 \right)
 ```
-Tous calculs faits nous trouvons:
+Tous calculs faits nous trouvons :
 ```math
 dF_{|(x_1,x_2)} = 
 \left(
@@ -408,7 +408,7 @@ dF_{|(x_1,x_2)} =
 \end{array}
 \right)
 ```
-Le gradient $\nabla f_{|(x_1,x_2)}$, se situe à la derniere ligne. Soit
+Le gradient $\nabla f_{|(x_1,x_2)}$, se situe à la dernière ligne. Soit
 ```math
 \nabla f_{|(x_1,x_2)} = 
 \left(
@@ -421,14 +421,14 @@ Le gradient $\nabla f_{|(x_1,x_2)}$, se situe à la derniere ligne. Soit
 !!! note "Attention"
     Il est fondamental de comprendre pourquoi...
 
-Pour calculer se vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cdot e_5$. Ceci se traduit par:
+Pour calculer ce vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cdot e_5$. Ceci se traduit par :
 ```math
 \begin{align}
 dF^t_{|(x_1,x_2)}\cdot e_5 &= ((d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)})^t \cdot e_5 \\
 &= (d\Phi_1)^t_{|(x_1,x_2)} \circ (d\Phi_2)^t_{|\Phi_2(x_1,x_2)} \circ(d\Phi_3)^t_{|\Phi_2(x_1,x_2,x_3)}  \cdot e_5
 \end{align}
 ```
-En explicitant les calculs:
+En explicitant les calculs :
 ```math
 \begin{align}
 dF^t_{|(x_1,x_2)}\cdot e_5 &= 
@@ -509,24 +509,24 @@ dF^t_{|(x_1,x_2)}\cdot e_5 &=
 \end{align}
 ```
 
-Le calcul précédent, de type $J^t\cdot e_i$,  qui calcule le gradient est le mode **backward** de la différentiation automatique. Le mode **forward** consiste a utiliser l'approche direct $J\cdot e_j$.
+Le calcul précédent, de type $J^t\cdot e_i$,  qui calcule le gradient est le mode **backward** de la différentiation automatique. Le mode **forward** consiste à utiliser l'approche direct $J\cdot e_j$.
 """
 
 # ╔═╡ c97b2d9c-fd4f-4502-8482-aa6db5b05325
 md"""
 ## Les modes forward et backward
 
-Si le calcul de $F$ se décompose en une suite d'étapes élémentaires:
+Si le calcul de $F$ se décompose en une suite d'étapes élémentaires :
 ```math
 F = \Phi_N \circ \dots \circ \Phi_2 \circ \Phi_1 
 ```
-alors la règle de la chaine s'éxprime par:
+alors la règle de la chaine s'exprime par :
 ```math
 dF = d\Phi_N \circ \dots \circ d\Phi_2 \circ d\Phi_1 
 ```
 
 ### Mode forward
-Le mode **forward** permet de calculer la matrice Jacobienne colonne par colonne en suivant le sens direct des calculs de $F$:
+Le mode **forward** permet de calculer la matrice Jacobienne colonne par colonne en suivant le sens direct des calculs de $F$ :
 ```math
 \Large{
 \left(
@@ -539,13 +539,13 @@ Le mode **forward** permet de calculer la matrice Jacobienne colonne par colonne
 }
 ```
 
-Avec le mode forward, il est également possible de calculer une **dérivée directionnelle** en replacent $e_j$ par $d$:
+Avec le mode forward, il est également possible de calculer une **dérivée directionnelle** en replacent $e_j$ par $d$ :
 ```math
 d(t\rightarrow F(x+t\,d))_{|t=0}=dF_{|x}\cdot d
 ```
 
 ### Mode backward
-Le mode **backward** permet de calculer la matrice Jacobienne ligne and ligne en suivant le sens inverse des calculs de $F$. Ceci nécessite donc un **stockage**:
+Le mode **backward** permet de calculer la matrice Jacobienne ligne and ligne en suivant le sens inverse des calculs de $F$. Ceci nécessite donc un **stockage** :
 ```math
 \Large{
 \left(
@@ -560,16 +560,16 @@ Le mode **backward** permet de calculer la matrice Jacobienne ligne and ligne en
 
 ## Cas d'usages
 
-L'idée principale est que l'on peut calculer une matrice Jacobienne de dimension , ligne par ligne ou colonne par colonne.
+L'idée principale est que l'on peut calculer une matrice Jacobienne de dimension $n\times m$, ligne par ligne ou colonne par colonne.
 
 - Le mode **forward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $m<n$. 
-- Le mode **backward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $n<m$. Un exemple classique est le cas du grradient.
+- Le mode **backward** est utilisé pour construire $J$ ligne par ligne, ce qui est avantageux quand $n<m$. Un exemple classique est le cas du gradient.
 """
 
 # ╔═╡ f72ec959-a3aa-420a-bf12-bc61f63a6d65
-md"""# Premiere implémentation
+md"""# Première implémentation
 
-Pour l'instant toutes les implémentations présentées sont des implementations "jouet" dont le but est de comprendre la démarche sans chercher ni la perfomance, ni la généricité.
+Pour l'instant toutes les implémentations présentées sont des implementations "jouet" dont le but est de comprendre la démarche sans chercher ni la performance, ni la généricité.
 """
 
 
@@ -577,7 +577,7 @@ Pour l'instant toutes les implémentations présentées sont des implementations
 md"""
 ## Enregistrement dans une "cassette" (tape)
 
-Si l'on suppose que les transformations élémentaires $\Phi_k$ sont de la forme:
+Si l'on suppose que les transformations élémentaires $\Phi_k$ sont de la forme :
 ```math
 \Phi_k(x_1,\dots,x_{k-1})=
 \left(
@@ -589,7 +589,7 @@ x_k=\phi(x_1,\dots,x_{k-1})
 \end{array}
 \right)
 ```
-alors $d\Phi$ est une matrice creuse de la forme:
+alors $d\Phi$ est une matrice creuse de la forme :
 ```math
 d\Phi_k=
 \left(
@@ -604,7 +604,7 @@ d\Phi_k=
 \right)
 ```
 
-L'ensemble des matrices $d\Phi_k, k=1,\dots,N$ est stocké dans un vecteur de vecteurs: la partie supérieure (matrice identité) est implicite et seul le vecteur creux $(\partial_1 \phi_k, \dots, \partial_k \phi_k)$ est stocké à la ligne $k$. 
+L'ensemble des matrices $d\Phi_k, k=1,\dots,N$ est stocké dans un vecteur de vecteurs : la partie supérieure (matrice identité) est implicite et seul le vecteur creux $(\partial_1 \phi_k, \dots, \partial_k \phi_k)$ est stocké à la ligne $k$. 
 
 Cette structure définie la "cassette" où sont enregistrées les informations.
 """
@@ -618,7 +618,7 @@ end
 
 # ╔═╡ d7a484d1-f54c-4ef2-8cde-d48c1d1e3be2
 # Global tape
-# ( remarque: il est possible d'être plus efficace en utilisant un stockage de type 
+# ( remarque : il est possible d'être plus efficace en utilisant un stockage de type 
 #   compressed row stoage (CRS). On ne le fait pas ici dans un but de simplicité )
 const tape = Vector{Vector{∂iϕ}}()
 
@@ -633,7 +633,7 @@ Pour implémenter le mode **direct**, il faut ensuite être en mesure de calcule
 \end{align}
 ```
 
-La structure des matrices $d\Phi_k$ permet de réaliser cette opération "sur-place" :
+La structure des matrices $d\Phi_k$ permet de réaliser cette opération surplace :
 """
 
 # ╔═╡ 65177381-acd6-4f11-ae47-bd942903e608
@@ -661,7 +661,7 @@ d\Phi^t_k=
 \right)
 ```
 
-permet de réaliser cette opération "sur-place" :
+permet de réaliser cette opération surplace :
 """
 
 # ╔═╡ 8132cc8c-2ca1-49af-8322-b53660d8cbb5
@@ -673,7 +673,7 @@ Pour remplir la "cassette" d'enregistrement on définit un nouveau type `AFloat6
 !!! exemple "Remarque"
     Lorsque l'on ajoute une variable, cela se traduit par une ligne vide. Il faut prendre un peu de temps pour réaliser que cela se passe bien. Ceci tient au fait, que la partie matrice identité est implicite.
 
-Le code Julia, ainsi que le contructeur associé est ci-dessous:
+Le code Julia, ainsi que le constructeur associé est ci-dessous:
 """
 
 # ╔═╡ 3d469d0a-723d-449a-bce2-80833f26b8c8
@@ -696,7 +696,7 @@ end
 
 # ╔═╡ 98053b26-9545-4f75-a49e-84be153b9af1
 md"""
-**Demonstration:** on déclare deux variables `x=2` et `y=3` et l'on affiche la "cassette", qui ne contient pour l'instant que deux lignes vides.
+**Illustration:** on déclare deux variables `x=2` et `y=3` et l'on affiche la "cassette", qui ne contient pour l'instant que deux lignes vides.
 """
 
 # ╔═╡ 6770e01c-ca6d-45e3-a3a8-48797e338679
@@ -849,11 +849,11 @@ end
 # ╔═╡ a7c2573a-19a2-4d4b-91a1-116e6d1e7c6a
 md"""
 La "cassette" a enregistré, 
-1. declaration de `x`
-2. declaration de `y`
-3. declaration de `x*y`
-4. declaration de `sin(x*y)`
-5. declaration de `x+sin(x*y)`
+1. déclaration de `x`
+2. déclaration de `y`
+3. déclaration de `x*y`
+4. déclaration de `sin(x*y)`
+5. déclaration de `x+sin(x*y)`
 """
 
 # ╔═╡ 99173920-cb95-4a02-9d95-41cf04459183
@@ -879,7 +879,7 @@ Vérification: si $z=x+\sin(xy)$, alors $\nabla z = (1+y\cos(xy),x\cos(xy))$. Si
 
 # ╔═╡ 5eccbecc-519f-4a3c-80d6-cd77e118d024
 md"""
-## Encapsulation des routines & "Syntactic sugar"
+## Encapsulation des routines, "syntactic sugar"
 
 Il s'agit d'encapsuler les procédures précédentes afin de rendre leur usage plus pratique.
 
@@ -966,7 +966,7 @@ gradient(z,[x,y])
 
 # ╔═╡ 8d789020-4c1e-4802-a220-2551af74b373
 md"""
-**Démonstration:** 
+**Illustration:** 
 l'avantage ici est que toute référence au type AFloat64 est cachée. L'utilisateur ne sait "même pas" que l'on calcule le gradient en utilisant la différentiation automatique.
 """
 
@@ -979,7 +979,7 @@ md"""
 
 ## Avantages
 
-- Implementation facile & unifiée des modes forward et backward
+- Implémentation facile & unifiée des modes forward et backward
 - Il est possible de faire des "cassettes" imbriquées pour calculer les dérivations d'ordre supérieur.
 
 Exemples de librairies:
@@ -988,7 +988,7 @@ Exemples de librairies:
 - [Adept C++](https://github.com/rjhogan/Adept)
 
 ## Inconvénients
-- pour le mode forward on n'est pas obligé d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
+- pour le mode forward on peut se passer d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
   - [autodiff C++](https://github.com/autodiff/autodiff)
   - [ForwardDiff.jl Julia](https://github.com/JuliaDiff/ForwardDiff.jl)
 - travail au niveau des scalaires, ce qui bloque en particulier l'usage de librairies telles que BLAS ou LAPACK 
@@ -996,7 +996,7 @@ Exemples de librairies:
 ### 'dot' exemple
 Pour l'algèbre linéaire dense, les librairies BLAS, LAPACK sont utilisées.
 
-Elles définissent des fonctions optimisée pour les opérations courantes, telle que le calcul de $\langle x,y \rangle$:
+Elles définissent des fonctions optimisées pour les opérations courantes, telle que le calcul de $\langle x,y \rangle$:
 
 ```C
 double cblas_ddot (const int n, 
@@ -1005,7 +1005,7 @@ double cblas_ddot (const int n,
 ```
 
 !!! note "Attention" 
-    Si l'on travaille au niveaux "scalaire", les operations matricielles ne bénificient plus de BLAS & LAPACK -> important overhead (pénalité $> \times 10$ + allocations mémoires)
+    La source du problème est que si l'on travaille au niveau "scalaire", les opérations matricielles ne bénificient plus de BLAS & LAPACK. Ceci conduit à une fort perte de performance.
 """
 
 # ╔═╡ 2628ace2-b983-4c97-8598-e118675df304
@@ -1024,7 +1024,7 @@ end
 
 # ╔═╡ 2bd03e6a-1038-43bd-9065-17938b853374
 md"""
-On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'éxecution.
+On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'exécution.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001

@@ -29,7 +29,7 @@ md"""
 md"""
 ## Print notebook table of contents
 
-Add ToC on the right, as for this is currently used for this notebook.
+Add a table of contents on the right (as currently used for this notebook).
 
 **Note:** requires `PlutoUI`
 """
