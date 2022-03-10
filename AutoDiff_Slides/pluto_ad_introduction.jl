@@ -285,7 +285,7 @@ Cette remarque toute simple permettra de cerner l'interet des modes **forward** 
 
 ### Exemple
 
-Toujours en revant à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, les composantes de la différentielle (matrice Jacobienne) et le gradient peuvent s'écrire:
+Toujours en revenant à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, les composantes de la différentielle (matrice Jacobienne) et le gradient peuvent s'écrire:
 
 ```math
 df_{|x}(\delta x) = \underbrace{\left( \partial_1 f_{|x}, \partial_2 f_{|x}, \dots, \partial_m f_{|x} \right)}_J \cdot
@@ -421,7 +421,7 @@ Le gradient $\nabla f_{|(x_1,x_2)}$, se situe à la derniere ligne. Soit
 !!! note "Attention"
     Il est fondamental de comprendre pourquoi...
 
-Pour calculer se vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cdot e_5$. Ceci se traduit par:
+Pour calculer ce vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cdot e_5$. Ceci se traduit par:
 ```math
 \begin{align}
 dF^t_{|(x_1,x_2)}\cdot e_5 &= ((d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)})^t \cdot e_5 \\
@@ -509,7 +509,7 @@ dF^t_{|(x_1,x_2)}\cdot e_5 &=
 \end{align}
 ```
 
-Le calcul précédent, de type $J^t\cdot e_i$,  qui calcule le gradient est le mode **backward** de la différentiation automatique. Le mode **forward** consiste a utiliser l'approche direct $J\cdot e_j$.
+Le calcul précédent, de type $J^t\cdot e_i$,  qui calcule le gradient est le mode **backward** de la différentiation automatique. Le mode **forward** consiste à utiliser l'approche direct $J\cdot e_j$.
 """
 
 # ╔═╡ c97b2d9c-fd4f-4502-8482-aa6db5b05325
@@ -560,10 +560,10 @@ Le mode **backward** permet de calculer la matrice Jacobienne ligne and ligne en
 
 ## Cas d'usages
 
-L'idée principale est que l'on peut calculer une matrice Jacobienne de dimension , ligne par ligne ou colonne par colonne.
+L'idée principale est que l'on peut calculer une matrice Jacobienne de dimension $n\times m$, ligne par ligne ou colonne par colonne.
 
 - Le mode **forward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $m<n$. 
-- Le mode **backward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $n<m$. Un exemple classique est le cas du grradient.
+- Le mode **backward** est utilisé pour construire $J$ ligne par ligne, ce qui est avantageux quand $n<m$. Un exemple classique est le cas du grradient.
 """
 
 # ╔═╡ f72ec959-a3aa-420a-bf12-bc61f63a6d65
@@ -696,7 +696,7 @@ end
 
 # ╔═╡ 98053b26-9545-4f75-a49e-84be153b9af1
 md"""
-**Demonstration:** on déclare deux variables `x=2` et `y=3` et l'on affiche la "cassette", qui ne contient pour l'instant que deux lignes vides.
+**Illustration:** on déclare deux variables `x=2` et `y=3` et l'on affiche la "cassette", qui ne contient pour l'instant que deux lignes vides.
 """
 
 # ╔═╡ 6770e01c-ca6d-45e3-a3a8-48797e338679
@@ -966,7 +966,7 @@ gradient(z,[x,y])
 
 # ╔═╡ 8d789020-4c1e-4802-a220-2551af74b373
 md"""
-**Démonstration:** 
+**Illustration:** 
 l'avantage ici est que toute référence au type AFloat64 est cachée. L'utilisateur ne sait "même pas" que l'on calcule le gradient en utilisant la différentiation automatique.
 """
 
@@ -988,7 +988,7 @@ Exemples de librairies:
 - [Adept C++](https://github.com/rjhogan/Adept)
 
 ## Inconvénients
-- pour le mode forward on n'est pas obligé d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
+- pour le mode forward on peut se passer d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
   - [autodiff C++](https://github.com/autodiff/autodiff)
   - [ForwardDiff.jl Julia](https://github.com/JuliaDiff/ForwardDiff.jl)
 - travail au niveau des scalaires, ce qui bloque en particulier l'usage de librairies telles que BLAS ou LAPACK 
@@ -1005,7 +1005,7 @@ double cblas_ddot (const int n,
 ```
 
 !!! note "Attention" 
-    Si l'on travaille au niveaux "scalaire", les operations matricielles ne bénificient plus de BLAS & LAPACK -> important overhead (pénalité $> \times 10$ + allocations mémoires)
+    La source du problème est que si l'on travaille au niveaux "scalaire", les operations matricielles ne bénificient plus de BLAS & LAPACK. Ceci conduit à une fort perte de performance.
 """
 
 # ╔═╡ 2628ace2-b983-4c97-8598-e118675df304
@@ -1024,7 +1024,7 @@ end
 
 # ╔═╡ 2bd03e6a-1038-43bd-9065-17938b853374
 md"""
-On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'éxecution.
+On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'exécution.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
