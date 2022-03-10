@@ -30,7 +30,7 @@ The SNIP algorithm is used in spectrometry. It computes a baseline.
 
 Although it works well in practice, AFAIK there is no real theory behind this algorithm.
 
-**TODO:** describe alogorithm... For the moment this notebook is simply a test to see if it is correctly rendered in GitHub.
+**TODO:** gives more details about the aogorithm... For the moment this notebook goal is to test rendereding.
 """
 
 # ╔═╡ 96072ae5-19ce-42f2-8dfa-b1c068ba7935
@@ -107,7 +107,7 @@ end
 md"""
 # References
 
-AFAIK the historical article
+The historical article: 
 
 1. Ryan, C. G. and Clayton, E. and Griffin, W. L. and Sie, S. H. and
    Cousens, D. R., SNIP, a statistics-sensitive background treatment for the
