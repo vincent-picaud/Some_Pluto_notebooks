@@ -50,9 +50,26 @@ PlutoUI.TableOfContents(aside=true)
 
 # ╔═╡ 878fd76f-f478-47cf-9279-0d254c60440e
 md"""
-# Slider with printed value
+# Slider with value
+"""
 
-From: [https://github.com/JuliaPluto/PlutoUI.jl/issues/11]()
+# ╔═╡ 68e2a50e-0137-4969-a006-f880feadbb7a
+md"""
+## Update
+
+Initially ot noticed in the doc, the `show_value` flag
+"""
+
+# ╔═╡ b1dac611-9c2b-4ad7-8501-65bc488e9bf9
+md"""
+Use me! $(@bind n2 Slider(1:10,show_value=true))
+"""
+
+# ╔═╡ f7bc0e15-ffce-4dbb-b0bc-3477acbd4572
+md"""
+## Obsolete
+
+I keep it for memory (source: [https://github.com/JuliaPluto/PlutoUI.jl/issues/11]()), but now **obsolete**.
 """
 
 # ╔═╡ 1a7764c0-9ee9-11ec-2326-99a31961d2b7
@@ -315,8 +332,11 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─1c0cbd99-c2b2-4102-a098-df67103d4e09
 # ╟─e62b0477-ae78-4561-ac6e-6c8660617b1d
 # ╠═43d4648e-f39e-4d5f-b9c5-fecad0b87cff
-# ╟─878fd76f-f478-47cf-9279-0d254c60440e
-# ╟─2b022346-1044-4f5d-95b3-1b49edbb15c0
+# ╠═878fd76f-f478-47cf-9279-0d254c60440e
+# ╠═68e2a50e-0137-4969-a006-f880feadbb7a
+# ╠═b1dac611-9c2b-4ad7-8501-65bc488e9bf9
+# ╟─f7bc0e15-ffce-4dbb-b0bc-3477acbd4572
+# ╠═2b022346-1044-4f5d-95b3-1b49edbb15c0
 # ╠═493dfa1a-c87e-4a8c-bf95-4f6d9a66a5f2
 # ╠═1a7764c0-9ee9-11ec-2326-99a31961d2b7
 # ╠═1e86f229-bc91-4871-a883-b23a884478a3

@@ -19,6 +19,7 @@ begin
 	using CairoMakie
 	using DelimitedFiles
 	using PlutoUI 
+	PlutoUI.TableOfContents(aside=true)
 end
 
 # ╔═╡ 309dacaa-9ecb-11ec-3a86-0b74dcb12bca
@@ -26,19 +27,26 @@ md"""
 # SNIP algorithm (spectrometry)
 
 The SNIP algorithm is used in spectrometry. It computes a baseline.
-"""
 
-# ╔═╡ 2a5ce96d-c724-4382-8298-3c2c3197b00c
-md"""
 Although it works well in practice, AFAIK there is no real theory behind this algorithm.
+
+**TODO:** describe alogorithm... For the moment this notebook is simply a test to see if it is correctly rendered in GitHub.
 """
 
-# ╔═╡ b7989e08-8fd5-4d97-9351-ba7a958fb5e1
+# ╔═╡ 96072ae5-19ce-42f2-8dfa-b1c068ba7935
 md"""
-**TODO:** provide some explaination about the algorithm
+## Load data
 """
 
-# ╔═╡ 88c41862-2ec3-455d-b82b-985e8dab2a08
+# ╔═╡ 04776871-603c-4bfc-b39e-1379090f28f7
+X, Y = eachcol(readdlm("data/gamma_spectrum.txt",Float32));
+
+# ╔═╡ e54c2169-e1a9-4f7a-8980-9355a765803a
+md"""
+## Algorithm implementation
+"""
+
+# ╔═╡ 1b7d26be-1630-4894-8b8b-7a2a40bd31db
 function compute_baseline_snip(Y::AbstractVector,snip_halfwindow::Int)
     @assert snip_halfwindow>0
 
@@ -63,58 +71,17 @@ function compute_baseline_snip(Y::AbstractVector,snip_halfwindow::Int)
     baseline
 end 
 
-# ╔═╡ 152cf63a-79f0-4fc2-b1f3-0ceef30d85bc
+# ╔═╡ 823cb64d-8613-49a9-b756-af6a18cd9d33
 md"""
-# References
-
-AFAIK the historical article
-
-1. Ryan, C. G. and Clayton, E. and Griffin, W. L. and Sie, S. H. and
-   Cousens, D. R., SNIP, a statistics-sensitive background treatment for the
-   quantitative analysis of PIXE spectra in geoscience applications
-
-
+## Result plot
 """
-
-# ╔═╡ ba81edc3-5ed5-45d1-b902-1ec74d516557
-md"""
-# Internals...
-"""
-
-# ╔═╡ fe375cec-e781-477c-9fd9-8282ca4ae04f
-# From: https://github.com/JuliaPluto/PlutoUI.jl/issues/11
-begin
-	Base.@kwdef struct MySlider 
-	    range::AbstractRange
-	    default::Number
-	end
-	function Base.show(io::IO, ::MIME"text/html", slider::MySlider)
-	    print(io, """
-		    <input type="range" 
-		    min="$(first(slider.range))" 
-			step="$(step(slider.range))"
-			max="$(last(slider.range))" 
-			value="$(slider.default)"
-			oninput="this.nextElementSibling.value=this.value">
-			<output>$(slider.default)</output>
-			""")
-	end
-end
 
 # ╔═╡ 1b6ee4dd-7949-4a14-998f-d68b4beb85d5
 md"""
 **SNIP parameters:**
 
-halfwindow $(@bind current_halfwindow MySlider(range=1:20,default=5))
+halfwindow $(@bind current_halfwindow PlutoUI.Slider(1:20,default=5,show_value=true))
 """
-
-# ╔═╡ 2b6907f4-04f2-473f-8286-8cdf8e0b5df6
-md"""
-Data
-"""
-
-# ╔═╡ 0e80516e-60fd-4afb-8832-79db51eb541b
-X, Y = eachcol(readdlm("data/gamma_spectrum.txt",Float32));
 
 # ╔═╡ e7cb0d73-2eb3-49be-aa3c-3e869431b41d
 let 
@@ -135,6 +102,19 @@ let
 		tellwidth = false, tellheight = true)
 	f
 end
+
+# ╔═╡ 152cf63a-79f0-4fc2-b1f3-0ceef30d85bc
+md"""
+# References
+
+AFAIK the historical article
+
+1. Ryan, C. G. and Clayton, E. and Griffin, W. L. and Sie, S. H. and
+   Cousens, D. R., SNIP, a statistics-sensitive background treatment for the
+   quantitative analysis of PIXE spectra in geoscience applications
+
+
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1310,15 +1290,13 @@ version = "3.5.0+0"
 # ╔═╡ Cell order:
 # ╟─568ab1d6-3e02-4af7-bf38-aa823979e2b7
 # ╟─309dacaa-9ecb-11ec-3a86-0b74dcb12bca
-# ╟─2a5ce96d-c724-4382-8298-3c2c3197b00c
+# ╟─96072ae5-19ce-42f2-8dfa-b1c068ba7935
+# ╠═04776871-603c-4bfc-b39e-1379090f28f7
+# ╟─e54c2169-e1a9-4f7a-8980-9355a765803a
+# ╠═1b7d26be-1630-4894-8b8b-7a2a40bd31db
+# ╟─823cb64d-8613-49a9-b756-af6a18cd9d33
 # ╟─e7cb0d73-2eb3-49be-aa3c-3e869431b41d
 # ╟─1b6ee4dd-7949-4a14-998f-d68b4beb85d5
-# ╟─b7989e08-8fd5-4d97-9351-ba7a958fb5e1
-# ╠═88c41862-2ec3-455d-b82b-985e8dab2a08
 # ╟─152cf63a-79f0-4fc2-b1f3-0ceef30d85bc
-# ╟─ba81edc3-5ed5-45d1-b902-1ec74d516557
-# ╟─fe375cec-e781-477c-9fd9-8282ca4ae04f
-# ╟─2b6907f4-04f2-473f-8286-8cdf8e0b5df6
-# ╠═0e80516e-60fd-4afb-8832-79db51eb541b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
