@@ -17,32 +17,21 @@ end
 # ╔═╡ 6c0d6773-d4a9-4485-a14d-2e43c62eb6ce
 begin
 	using PlutoUI
+	PlutoUI.TableOfContents(aside=true)
 end
 
 # ╔═╡ dedb9336-134d-4913-bff3-869cf3f416e5
 md"""
-A collection of Pluto tips... 
+# A collection of Pluto tips...
 """
-
-# ╔═╡ 3ba39661-7654-4f88-a43a-c748de5c57f2
-md"""
-# Presentation mode
-
-From: [https://github.com/JuliaPluto/PlutoUI.jl/issues/11]()
-
-Click on "Present" to enter mode, use arrows to navigate, click on "Present" to exit mode.
-
-To be honest, not sure it really works well...
-"""
-
-# ╔═╡ 1c0cbd99-c2b2-4102-a098-df67103d4e09
-html"<button onclick=present()>Present</button>"
 
 # ╔═╡ e62b0477-ae78-4561-ac6e-6c8660617b1d
 md"""
-# Table of contents
+## Print notebook table of contents
 
-**note:** requires `PlutoUI`
+Add ToC on the right, as for this is currently used for this notebook.
+
+**Note:** requires `PlutoUI`
 """
 
 # ╔═╡ 43d4648e-f39e-4d5f-b9c5-fecad0b87cff
@@ -50,65 +39,41 @@ PlutoUI.TableOfContents(aside=true)
 
 # ╔═╡ 878fd76f-f478-47cf-9279-0d254c60440e
 md"""
-# Slider with value
-"""
+## Slider with value
 
-# ╔═╡ 68e2a50e-0137-4969-a006-f880feadbb7a
-md"""
-## Update
-
-Initially ot noticed in the doc, the `show_value` flag
+Not really explicit in the official doc, you can set the kwarg `show_value=true`
 """
 
 # ╔═╡ b1dac611-9c2b-4ad7-8501-65bc488e9bf9
 md"""
-Use me! $(@bind n2 Slider(1:10,show_value=true))
+An example: $(@bind n2 Slider(1:10,default=5,show_value=true))
 """
-
-# ╔═╡ f7bc0e15-ffce-4dbb-b0bc-3477acbd4572
-md"""
-## Obsolete
-
-I keep it for memory (source: [https://github.com/JuliaPluto/PlutoUI.jl/issues/11]()), but now **obsolete**.
-"""
-
-# ╔═╡ 1a7764c0-9ee9-11ec-2326-99a31961d2b7
-# From: https://github.com/JuliaPluto/PlutoUI.jl/issues/11
-begin
-	Base.@kwdef struct MySlider 
-	    range::AbstractRange
-	    default::Number
-	end
-	function Base.show(io::IO, ::MIME"text/html", slider::MySlider)
-	    print(io, """
-		    <input type="range" 
-		    min="$(first(slider.range))" 
-			step="$(step(slider.range))"
-			max="$(last(slider.range))" 
-			value="$(slider.default)"
-			oninput="this.nextElementSibling.value=this.value">
-			<output>$(slider.default)</output>
-			""")
-	end
-end
-
-# ╔═╡ 2b022346-1044-4f5d-95b3-1b49edbb15c0
-md"""
-My example: $(@bind n MySlider(range=1:10,default=5))
-"""
-
-# ╔═╡ 493dfa1a-c87e-4a8c-bf95-4f6d9a66a5f2
-n
 
 # ╔═╡ 1e86f229-bc91-4871-a883-b23a884478a3
 md"""
-# Pretty box
+## Pretty box
+
+As follows:
 
 !!! example "An example"
     blabla ....
 
     blabla ....
 """
+
+# ╔═╡ 1dcecbb9-b8fe-478a-b157-53a1bcfb7071
+md"""
+## Presentation mode
+
+From: [https://github.com/JuliaPluto/PlutoUI.jl/issues/11]()
+
+Click on "Present" to enter mode, use arrows to navigate, click on "Present" to exit mode.
+
+**CAVEAT:** to be honest, not sure that it works well...
+"""
+
+# ╔═╡ 25ea3035-b517-471c-81b3-c2c400195c11
+html"<button onclick=present()>Present</button>"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -328,17 +293,12 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╔═╡ Cell order:
 # ╟─6c0d6773-d4a9-4485-a14d-2e43c62eb6ce
 # ╟─dedb9336-134d-4913-bff3-869cf3f416e5
-# ╟─3ba39661-7654-4f88-a43a-c748de5c57f2
-# ╟─1c0cbd99-c2b2-4102-a098-df67103d4e09
 # ╟─e62b0477-ae78-4561-ac6e-6c8660617b1d
 # ╠═43d4648e-f39e-4d5f-b9c5-fecad0b87cff
 # ╠═878fd76f-f478-47cf-9279-0d254c60440e
-# ╠═68e2a50e-0137-4969-a006-f880feadbb7a
-# ╠═b1dac611-9c2b-4ad7-8501-65bc488e9bf9
-# ╟─f7bc0e15-ffce-4dbb-b0bc-3477acbd4572
-# ╠═2b022346-1044-4f5d-95b3-1b49edbb15c0
-# ╠═493dfa1a-c87e-4a8c-bf95-4f6d9a66a5f2
-# ╠═1a7764c0-9ee9-11ec-2326-99a31961d2b7
-# ╠═1e86f229-bc91-4871-a883-b23a884478a3
+# ╟─b1dac611-9c2b-4ad7-8501-65bc488e9bf9
+# ╟─1e86f229-bc91-4871-a883-b23a884478a3
+# ╟─1dcecbb9-b8fe-478a-b157-53a1bcfb7071
+# ╟─25ea3035-b517-471c-81b3-c2c400195c11
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

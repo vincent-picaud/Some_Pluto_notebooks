@@ -4,104 +4,1041 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ d2685db7-b922-48fd-944b-0cd4a521ce4c
+# ╔═╡ ce235e96-6bf8-4601-847b-808cd0d06261
 begin
-	using CairoMakie
-	using ForwardDiff
+ 	using CairoMakie
 	using PlutoUI
 	PlutoUI.TableOfContents(aside=true)
-end	
-
-# ╔═╡ e12ba51c-8ffb-470d-b682-54d15c31740c
-md"""
-# Goal
-
-Reproduce some results of [Gradients without Backpropagation](https://arxiv.org/abs/2202.08587)
-
-A simple idea that seems to work. Uses a gradient projected random direction that only requires forward mode (and not backpropagation). 
-"""
-
-# ╔═╡ 9158c15e-7c02-4bda-8d6a-ed8b7561cc99
-md"""
-# Test functions
-"""
-
-# ╔═╡ eeb8fa92-9f8d-11ec-2edf-fda09d802ef7
-md"""
-## Beal Function
-
-[https://www.sfu.ca/~ssurjano/beale.html]()
-
-global min: (3.0,0.5)
-"""
-
-# ╔═╡ cc2e3332-c6aa-4619-af4d-84f401410463
-function f_Beal(X::AbstractVector) 
-	x, y = X
-	
-	(1.5-x+x*y)^2+(2.25-x+x*y)^2+(2.625-x+x*y^3)^2
 end
 
-# ╔═╡ a163fc32-b0b3-46bb-a30e-532fb27c31bd
+# ╔═╡ 7c079152-43a9-4290-81b4-04788a4eb3bc
+using LinearAlgebra,BenchmarkTools
+
+# ╔═╡ c827ef5e-c184-4e06-9d0f-fb4a22a71266
 md"""
-# Algorithm
+!!! exemple ""
+    **Introduction à la Différentiation Automatique**
+
+    vincent.picaud@cea.fr
 """
 
-# ╔═╡ b25cb7d7-3b00-4389-af8c-0e1ccf5e803d
-function fgd(f::Function,θ::AbstractVector,η::Real)
-	n=length(θ)
-	iterate = deepcopy(θ)
-	for i in 1:1000
-		v = randn(n)
-		d = ForwardDiff.derivative(t -> f((θ + t * v)), 0.0)
-		v .*= η*d
-		θ .-= v
-		iterate=vcat(iterate,θ)
+# ╔═╡ b8371073-56c9-4075-b16e-8f17b0b93d9b
+md"""
+# Introduction
+
+La "différentiation automatique" est un **ensemble** de techniques ayant pour but le calcul efficace des dérivées.
+
+La différentiation automatique **n'est pas** :
+- la differentiation symbolique
+- l'usage des différences finies
+"""
+
+# ╔═╡ cffc3edc-1806-444e-aecc-373e869dfddb
+md"""
+## Différentiation symbolique
+
+Non recommandée en général:
+- La coomplexité des expressions croit rapidement
+  ```math
+  \begin{align*}
+  \left(\frac{f}{g}\right)' &= \frac{g(x) f'(x)-f(x) g'(x)}{g(x)^2} \\
+  \left(\frac{f}{g}\right)'' &= \frac{g(x)^2 f''(x)-g(x) \left(2 f'(x) g'(x)+f(x)   g''(x)\right)+2 f(x)
+   g'(x)^2}{g(x)^3}
+  \end{align*}
+  ```
+  il faut ajouter la lenteur du calcul formel (manipulation d'arbres, heuristiques...)
+- Problématique pour différentier un code général: boucles, branchements etc...
+```julia
+function f(x)
+	if x<0
+		return 0
+	else
+		return x*x
 	end
-	@assert mod(length(iterate),n)==0
-	reshape(iterate,(n,div(length(iterate),n)))'
 end
-
-# ╔═╡ 53ab660e-8cd5-4151-8073-9284a479f540
-iterate = fgd(f_Beal,Float64[1,0],0.02)
-
-# ╔═╡ 18ed4b1f-a85e-412e-b24e-711bab54960c
-f_Beal.(eachrow(iterate))
-
-# ╔═╡ 91604bb8-1865-460d-90aa-350c3496ff63
- ForwardDiff.gradient(f_Beal,iterate[end,:])
-
-# ╔═╡ caf9dfaa-1793-4108-864d-61c75e13b7e3
-md"""
-# Plot function
+```
 """
 
-# ╔═╡ e73127a1-2a6d-4e46-8186-ce626ba2f2ea
-let f=f_Beal
-	
-	x = collect(0:0.1:3)
-	y = collect(-0.4:0.1:0.6)
-	z  = [f([xi,yj]) for xi in x, yj in y]  
+# ╔═╡ 89843eb3-9bac-4924-a98b-63b0c3d42697
+md"""
+## Différences finies
 
-	# plot
-	fig = Figure()
-	ax=Axis(fig[1,1])
-	contour!(ax,x,y, z, levels=20)
-	lines!(ax,iterate[:,1],iterate[:,2])
-	fig
-end	
+Deux problèmes principaux:
+- stabilité numérique :
+  ```math
+  \lim_{h\rightarrow 0}\frac{f(x_0+h)-f(x_0)}{h}
+  ```
+
+- inefficace dans le cas multidimensionel $f(x_1,\dots,x_n)$ :
+  ```math
+  i=1\dots n,\ \lim_{h\rightarrow 0}\frac{f(x_0+h e_i)-f(x_0)}{h}
+  ```
+
+Par contre c'est un moyen commode lors de phase se test/debuggage
+"""
+
+# ╔═╡ 3c9ff7f2-6b4c-4d0a-9bc3-e719504b7f1e
+md"""
+### Stabilité numérique, illustration 
+
+Il s'agit de calculer $\sin'(1)$ en utilisant
+```math
+\sin'(1) \approx \frac{\sin(1+h)-\sin(1)}{h}
+```
+
+
+
+!!! remark
+    en pratique si l'on doit vraiment utiliser les différences finies, on prend      
+    $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les `Float64`, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
+"""
+
+# ╔═╡ 579249f9-e7d8-4097-b358-7d410a1b0d87
+md"""
+## Differentiation automatique
+
+Il y a principalement deux techniques pour mettre en ouvre la différentiation automatique:
+- **surcharge des opérateurs**
+- transformation du code source
+
+Il y a également deux modes de fonctionnement:
+- mode **forward** 
+- mode **backward**
+
+!!! remark 
+    pour les dérivations **d'ordre supérieur**, il est possible d'alterner les
+	modes **forward** et **backward**
+"""
+
+# ╔═╡ adfafc42-1dc5-4ba1-8922-bd300423540b
+md"""
+# Rappels de calcul différentiel
+"""
+
+# ╔═╡ a5046c2e-1d37-4a89-9c34-f0c961592f94
+md"""
+## Définition
+
+!!! definition "Différentielle"
+    Une fonction $f$ est differentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire bornée, notée $df_{|x}$, telle que:
+    ```math
+	f(x+\delta x) = f(x) + df_{|x}\cdot \delta x + o(\|\delta x\|)
+    ```
+    (rappel: $f\in o(g) \Leftrightarrow \lim_{x\rightarrow 0}\frac{\|f(x)\|}{g(x)}=0$)
+
+    Une fonction $f$ est differentiable si elle est différentiable en tout point $x$.
+
+**Retour sur les notations:**
+
+si $f:\mathbb{R}^m\to\mathbb{R}^n$, alors:
+```math
+\begin{eqnarray}
+ df: \mathbb{R}^m & \to & \mathcal{L}(\mathbb{R}^m,\mathbb{R}^n)\\
+     x & \mapsto & df_{|x} \\
+\end{eqnarray}
+```
+et
+```math
+\begin{eqnarray}
+ df_{|x}: \mathbb{R}^m & \to & \mathbb{R}^n\\
+     \delta x & \mapsto & df_{|x}\cdot \delta x \\
+\end{eqnarray}
+```
+
+### Exemple 1
+On considère $g:x\mapsto \|x\|_2^2$. 
+
+Comme
+```math
+\Large{
+\underbrace{\|x+\delta x\|_2^2}_{g(x+\delta x)} =  \underbrace{\|x\|_2^2}_{g(x)} + \underbrace{2 \langle  x,\delta x \rangle}_{dg_{|x}\cdot \delta x}  + \underbrace{\|\delta x\|_2^2}_{o(\|\delta x\|)}}
+```
+
+La différentielle est donc:
+```math
+dg =  x\mapsto (\delta x \mapsto 2 \langle  x, \delta x \rangle) \in \left(\mathbb{R}^m \to \mathcal{L}(\mathbb{R}^m,\mathbb{R}) \right)
+```
+La différentielle en $x_0$ est:
+```math
+dg_{|x_0} =  \delta x \mapsto 2 \langle  x_0, \delta x \rangle \in \mathcal{L}(\mathbb{R}^m,\mathbb{R})
+```
+sont action sur le vecteur $\delta x$ est:
+```math
+dg_{|x_0}\cdot \delta x =  2 \langle  x_0, \delta x \rangle \in \mathbb{R}
+```
+
+### Exemple 2
+On considère la fonction affine: $f:x\mapsto M\cdot x + y$. 
+
+Comme
+```math
+\Large{
+\underbrace{M\cdot (x+\delta x)-y}_{f(x+\delta x)} =  \underbrace{M\cdot x -y}_{f(x)} + \underbrace{M\cdot \delta x}_{df_{|x}\cdot \delta x}  + \underbrace{0}_{o(\|\delta x\|)}}
+```
+la differentielle est l'application constante: 
+```math
+x\mapsto (\delta x \mapsto M\cdot \delta x) 
+```
+"""
+
+# ╔═╡ 88fc447e-007d-4eca-811f-badf024578cd
+md"""
+## Règle de la chaine
+
+Il s'agit de trouver la différentielle des fonctions composées
+
+!!! exemple "Règle de la chaine"
+    ```math
+    d(g \circ f)_{|x} \cdot \delta x = dg_{|f(x)}\circ df_{|x} \cdot \delta x 
+    ```
+
+### Exemple
+
+On considère $x\mapsto h(x)=\| M\cdot x - y\|^2_2$. 
+
+Comme $h=g\circ f$ avec $g=\|.\|_2^2$ et $f=M\cdot . -y$, alors:
+
+```math
+\Large{
+ \begin{align*}
+   d(x\mapsto h(x))_{|x_0} &= d(x \mapsto g(x))_{|Mx_0-y}\circ d(x \mapsto f(x))_{|x_0} \\
+                                  &= (\delta f \mapsto  2 \langle  M\cdot x_0-y, \delta f \rangle)  \circ (\delta x \mapsto M \delta x) \\
+			          &= \delta x \mapsto 2 \langle  M\cdot x_0-y, M \cdot \delta x \rangle \\
+\end{align*}
+}
+```
+La différentielle de $h$ est donc:
+```math
+dh = (x\mapsto (\delta x\mapsto 2 \langle  M\cdot x-y, M\cdot \delta x \rangle))
+```
+"""
+
+# ╔═╡ f3309a59-d96e-42d3-be7a-3bb124619741
+md"""
+## Gradient
+
+Contrairement à la différentielle, pour définir un gradient il faut un **produit scalaire** (espace de Hilbert). L'existence du gradient
+découle du théorème de représentation de Ritz, qui démontre que toute toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
+
+!!! definition "Vecteur gradient"
+    Pour une fonction differentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Ritz, il existe donc un vector $v_x$ tel 		que:
+	```math
+	df_{|x}\cdot \delta x  =\langle v_x , \delta x \rangle
+	```
+    Le vecteur $v_x$ est le **gradient** de $f$ en $x$, il est souvent noté $\nabla 		f_{|x}$
+
+### Exemple
+
+Si l'on revient à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, qui est une application de $\mathbb{R}^m$ dans $\mathbb{R}$, nous avions montré que:
+
+```math
+dh_{|x} = (\delta x\mapsto 2 \langle  M\cdot x-y, M\cdot \delta x \rangle) \in \mathcal{L}(\mathbb{R}^m,\mathbb{R})
+```
+Cette forme linéaire peut s'écrire:
+```math
+dh_{|x} = \delta x\mapsto \langle 2 M^t(M\cdot x-y), \delta x \rangle
+```
+le gradient est donc:
+```math
+\nabla h_{|x} = 2 M^t(M\cdot x-y)
+```
+"""
+
+# ╔═╡ c08c6755-342b-4c0e-a00e-c15f84c1bf83
+md"""
+## Matrice Jacobienne
+
+Soit $f:\mathbb{R}^m\to\mathbb{R}^n$, la matrice Jacobienne est la représentation matricielle de l'application linéaire $\delta x\mapsto df_{|x}\cdot \delta x$
+
+```math
+J_{|x}=
+\left(
+\begin{array}{ccc}
+\partial_1 f^1_{|x} & \dots & \partial_m f^1_{|x} \\
+\vdots & \ddots & \vdots \\
+\partial_1 f^n_{|x} & \dots & \partial_m f^n_{|x} \\
+\end{array}
+\right)
+```
+
+!!! example "A retenir..."
+    - Pour obtenir la colonne $j$ de $J$ il suffit de calculer $J\cdot e_j$. Ceci 		permet de calculer en une seul produit la dérivée de toutes les quantités par 		rapport à une seule variable $x_j$:
+	```math
+	\left(
+	\begin{array}{c}
+	\partial_j f^1_{|x} \\
+	\vdots \\
+	\partial_j f^n_{|x}  \\
+	\end{array}
+	\right)
+	```
+	- pour obtenir la ligne $i$ de $J$ il suffit de calculer $e_i^t J^t = J^t\cdot e_i$. Ceci permet de calculer la dérivée d'une seule grandeur par rapport à toutes les variables (cad une information de "type" gradient)
+	```math
+	\left(
+	\begin{array}{ccc}
+	\partial_1 f^i_{|x} & \dots & \partial_m f^i_{|x} \\
+	\end{array}
+	\right)
+    ```
+
+Cette remarque toute simple permettra de cerner l'interet des modes **forward** et **backward**.
+
+### Exemple
+
+Toujours en revant à l'exemple: $x\mapsto h(x)=\| M\cdot x - y\|^2_2$, les composantes de la différentielle (matrice Jacobienne) et le gradient peuvent s'écrire:
+
+```math
+df_{|x}(\delta x) = \underbrace{\left( \partial_1 f_{|x}, \partial_2 f_{|x}, \dots, \partial_m f_{|x} \right)}_J \cdot
+\left( \begin{array}{c} \delta x_1 \\ \delta x_2 \\ \vdots \\ \delta x_m \end{array}\right) =
+\langle \left( \begin{array}{c} \partial_1 f_{|x} \\ \partial_2 f_{|x} \\ \vdots \\ \partial_m f_{|x} \end{array}\right), \left( \begin{array}{c} \delta x_1 \\ \delta x_2 \\ \vdots \\ \delta x_m \end{array}\right) \rangle =
+\langle \nabla f_{|x}, \delta x \rangle 
+```
+En particulier pour calculer le gradient, il suffit d'évaluer $J^t\cdot \mathbf{1}$
+
+!!! note "Au risque d'insister..."
+    Le gradient est un **vecteur**, mais c'est une **ligne** de la Jacobienne.
+
+"""
+
+# ╔═╡ 286f2fe1-443e-430b-8549-fb65c2bc224d
+md"""
+# Différentiation automatique
+"""
+
+# ╔═╡ f2f50bb5-a42d-4701-ae29-d9e2539e5136
+md"""
+## Idée de base
+
+On souhaite calculer le gradient de $f:(x_1,x_2)\mapsto x_1+\sin(x_1x_2)$.
+
+L'idée est de:
+- décomposer le cacul en étapes élémentaires
+- utiliser la règle de la chaine
+
+Ici cela consiste a introduire les fonctions:
+```math
+\Phi_1(x_1,x_2)=
+\left(
+\begin{array}{c}
+x_1 \\
+x_2 \\
+x_1 x_2
+\end{array}
+\right)
+,\ 
+\Phi_2(x_1,x_2,x_3)=
+\left(
+\begin{array}{c}
+x_1 \\
+x_2 \\
+x_3 \\
+\sin(x_3)
+\end{array}
+\right)
+,\ 
+\Phi_3(x_1,x_2,x_3,x_4)=
+\left(
+\begin{array}{c}
+x_1 \\
+x_2 \\
+x_3 \\
+x_4 \\
+x_3 + x_4
+\end{array}
+\right)
+```
+de telle sorte que:
+```math
+\left(
+\begin{array}{c}
+x_1 \\
+x_2 \\
+x_1 x_2 \\
+\sin(x_1 x_2) \\
+\underbrace{x1 + \sin(x_1 x_2)}_{f(x_1,x_2)} \\
+\end{array}
+\right) = F(x_1,x_2) = \Phi_3 \circ \Phi_2 \circ \Phi_1(x_1,x_2)
+```
+
+La différentielle $dF$ est donnée par:
+```math
+dF_{|(x_1,x_2)} = (d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)}
+```
+soit plus explicitement:
+```math
+dF_{|(x_1,x_2)} = 
+\left(
+\begin{array}{cccc}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\hline
+1 & 0 & 0 & 1 
+\end{array}
+\right)
+\left(
+\begin{array}{ccc}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\hline
+0 & 0 & \cos(x_3) 
+\end{array}
+\right)
+\left(
+\begin{array}{cc}
+1 & 0 \\
+0 & 1 \\
+\hline
+x_2 & x_1 
+\end{array}
+\right)
+```
+Tous calculs faits nous trouvons:
+```math
+dF_{|(x_1,x_2)} = 
+\left(
+\begin{array}{cc}
+ 1 & 0 \\
+ 0 & 1 \\
+ x_1 & x_2 \\
+ \cos \left(x_1 x_2\right) x_1 & \cos \left(x_1 x_2\right) x_2 \\
+ \cos \left(x_1 x_2\right) x_1+1 & \cos \left(x_1 x_2\right) x_2 \\
+\end{array}
+\right)
+```
+Le gradient $\nabla f_{|(x_1,x_2)}$, se situe à la derniere ligne. Soit
+```math
+\nabla f_{|(x_1,x_2)} = 
+\left(
+\begin{array}{c}
+\cos \left(x_1 x_2\right) x_1+1 \\
+\cos \left(x_1 x_2\right) x_2
+\end{array}
+\right)
+```
+!!! note "Attention"
+    Il est fondamental de comprendre pourquoi...
+
+Pour calculer se vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cdot e_5$. Ceci se traduit par:
+```math
+\begin{align}
+dF^t_{|(x_1,x_2)}\cdot e_5 &= ((d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)})^t \cdot e_5 \\
+&= (d\Phi_1)^t_{|(x_1,x_2)} \circ (d\Phi_2)^t_{|\Phi_2(x_1,x_2)} \circ(d\Phi_3)^t_{|\Phi_2(x_1,x_2,x_3)}  \cdot e_5
+\end{align}
+```
+En explicitant les calculs:
+```math
+\begin{align}
+dF^t_{|(x_1,x_2)}\cdot e_5 &= 
+\left(
+\begin{array}{cc|c}
+ 1 & 0 & x_1 \\
+ 0 & 1 & x_2 \\
+\end{array}
+\right)
+\left(
+\begin{array}{ccc|c}
+ 1 & 0 & 0 & 0 \\
+ 0 & 1 & 0 & 0 \\
+ 0 & 0 & 1 & \cos \left(x_1 x_2\right) \\
+\end{array}
+\right)
+\left(
+\begin{array}{cccc|c}
+ 1 & 0 & 0 & 0 & 1 \\
+ 0 & 1 & 0 & 0 & 0 \\
+ 0 & 0 & 1 & 0 & 0 \\
+ 0 & 0 & 0 & 1 & 1 \\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+ 0 \\
+ 0 \\
+ 0 \\
+ 0 \\
+ 1 \\
+\end{array}
+\right) \\
+&= 
+\left(
+\begin{array}{cc|c}
+ 1 & 0 & x_1 \\
+ 0 & 1 & x_2 \\
+\end{array}
+\right)
+\left(
+\begin{array}{ccc|c}
+ 1 & 0 & 0 & 0 \\
+ 0 & 1 & 0 & 0 \\
+ 0 & 0 & 1 & \cos \left(x_1 x_2\right) \\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+ 1 \\
+ 0 \\
+ 0 \\
+ 1 \\
+\end{array}
+\right) \\
+&= 
+\left(
+\begin{array}{cc|c}
+ 1 & 0 & x_1 \\
+ 0 & 1 & x_2 \\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+ 1 \\
+ 0 \\
+ \cos \left(x_1 x_2\right) \\
+\end{array}
+\right) \\
+&= 
+\left(
+\begin{array}{c}
+ \cos \left(x_1 x_2\right) x_1+1 \\
+ \cos \left(x_1 x_2\right) x_2 \\
+\end{array}
+\right) \\
+&= \nabla f_{|(x_1,x_2)}
+\end{align}
+```
+
+Le calcul précédent, de type $J^t\cdot e_i$,  qui calcule le gradient est le mode **backward** de la différentiation automatique. Le mode **forward** consiste a utiliser l'approche direct $J\cdot e_j$.
+"""
+
+# ╔═╡ c97b2d9c-fd4f-4502-8482-aa6db5b05325
+md"""
+## Les modes forward et backward
+
+Si le calcul de $F$ se décompose en une suite d'étapes élémentaires:
+```math
+F = \Phi_N \circ \dots \circ \Phi_2 \circ \Phi_1 
+```
+alors la règle de la chaine s'éxprime par:
+```math
+dF = d\Phi_N \circ \dots \circ d\Phi_2 \circ d\Phi_1 
+```
+
+### Mode forward
+Le mode **forward** permet de calculer la matrice Jacobienne colonne par colonne en suivant le sens direct des calculs de $F$:
+```math
+\Large{
+\left(
+\begin{array}{c}
+\partial_j F^1_{|x} \\
+\vdots \\
+\partial_j F^n_{|x}  \\
+\end{array}
+\right) = d\Phi_N \circ \dots \circ \underbrace{ d\Phi_3 \circ \underbrace{d\Phi_2 \circ \underbrace{d\Phi_1.e_j}_{v=d\Phi_1.e_j}}_{v=d\Phi_2.v}}_{v=d\Phi_3.v}
+}
+```
+
+Avec le mode forward, il est également possible de calculer une **dérivée directionnelle** en replacent $e_j$ par $d$:
+```math
+d(t\rightarrow F(x+t\,d))_{|t=0}=dF_{|x}\cdot d
+```
+
+### Mode backward
+Le mode **backward** permet de calculer la matrice Jacobienne ligne and ligne en suivant le sens inverse des calculs de $F$. Ceci nécessite donc un **stockage**:
+```math
+\Large{
+\left(
+\begin{array}{c}
+\partial_1 F^i_{|x} \\
+\vdots \\
+\partial_m F^i_{|x}  \\
+\end{array}
+\right) =  d\Phi^t_1 \circ \dots \circ \underbrace{ d\Phi^t_{N-2} \circ \underbrace{d\Phi^t_{N-1} \circ \underbrace{d\Phi^t_N.e_i}_{v=d\Phi^t_N.e_i}}_{v=d\Phi^t_{N-1}.v}}_{v=d\Phi^t_{N-2}.v}
+}
+```
+
+## Cas d'usages
+
+L'idée principale est que l'on peut calculer une matrice Jacobienne de dimension , ligne par ligne ou colonne par colonne.
+
+- Le mode **forward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $m<n$. 
+- Le mode **backward** est utilisé pour construire $J$ colonne par colonne, ce qui est avantageux quand $n<m$. Un exemple classique est le cas du grradient.
+"""
+
+# ╔═╡ f72ec959-a3aa-420a-bf12-bc61f63a6d65
+md"""# Premiere implémentation
+
+Pour l'instant toutes les implémentations présentées sont des implementations "jouet" dont le but est de comprendre la démarche sans chercher ni la perfomance, ni la généricité.
+"""
+
+
+# ╔═╡ 176e0e85-dacc-4c06-ad1a-30adf486ce3d
+md"""
+## Enregistrement dans une "cassette" (tape)
+
+Si l'on suppose que les transformations élémentaires $\Phi_k$ sont de la forme:
+```math
+\Phi_k(x_1,\dots,x_{k-1})=
+\left(
+\begin{array}{c}
+x_1 \\
+\vdots \\
+x_{k-1} \\
+x_k=\phi(x_1,\dots,x_{k-1})
+\end{array}
+\right)
+```
+alors $d\Phi$ est une matrice creuse de la forme:
+```math
+d\Phi_k=
+\left(
+\begin{array}{cccc}
+1 & 0 & \dots & 0 \\
+0 & 1 & \ddots & \vdots \\
+\vdots & \ddots & 1 & 0 \\
+0 & \dots & 0 & 1  \\
+\hline
+\partial_1 \phi_k & \dots & \dots & \partial_{k-1} \phi_{k-1}
+\end{array}
+\right)
+```
+
+L'ensemble des matrices $d\Phi_k, k=1,\dots,N$ est stocké dans un vecteur de vecteurs: la partie supérieure (matrice identité) est implicite et seul le vecteur creux $(\partial_1 \phi_k, \dots, \partial_k \phi_k)$ est stocké à la ligne $k$. 
+
+Cette structure définie la "cassette" où sont enregistrées les informations.
+"""
+
+# ╔═╡ 18b26595-be3e-4f29-bcc0-96bdf3fdb6db
+# Stocke ∂ᵢϕ
+struct ∂iϕ
+    i::Int
+    ∂::Float64
+end
+
+# ╔═╡ d7a484d1-f54c-4ef2-8cde-d48c1d1e3be2
+# Global tape
+# ( remarque: il est possible d'être plus efficace en utilisant un stockage de type 
+#   compressed row stoage (CRS). On ne le fait pas ici dans un but de simplicité )
+const tape = Vector{Vector{∂iϕ}}()
+
+# ╔═╡ a48c6a8f-e0c5-4679-9c85-727861ee9f24
+md"""
+Pour implémenter le mode **direct**, il faut ensuite être en mesure de calculer
+```math
+\begin{align}
+\delta &= d\Phi_1 \cdot \delta \\
+\vdots &= \ \ \ \ \vdots \\
+\delta &= d\Phi_N \cdot \delta \\
+\end{align}
+```
+
+La structure des matrices $d\Phi_k$ permet de réaliser cette opération "sur-place" :
+"""
+
+# ╔═╡ 65177381-acd6-4f11-ae47-bd942903e608
+md"""
+Pour implémenter le mode **backward**, il faut ensuite être en mesure de calculer
+```math
+\begin{align}
+\delta &= d\Phi^t_N \cdot \delta \\
+\vdots &= \ \ \ \ \vdots \\
+\delta &= d\Phi^t_1 \cdot \delta \\
+\end{align}
+```
+
+La structure des matrices $d\Phi^t_k$,
+
+```math
+d\Phi^t_k=
+\left(
+\begin{array}{cccc|c}
+1 & 0 & \dots & 0 & \partial_1 \phi_k \\
+0 & 1 & \ddots & \vdots  & \vdots \\
+\vdots & \ddots & 1 & 0  & \vdots \\
+0 & \dots & 0 & 1  & \partial_{k-1} \phi_k  \\
+\end{array}
+\right)
+```
+
+permet de réaliser cette opération "sur-place" :
+"""
+
+# ╔═╡ 8132cc8c-2ca1-49af-8322-b53660d8cbb5
+md"""
+## Surcharge des opérateurs
+
+Pour remplir la "cassette" d'enregistrement on définit un nouveau type `AFloat64`.
+
+!!! exemple "Remarque"
+    Lorsque l'on ajoute une variable, cela se traduit par une ligne vide. Il faut prendre un peu de temps pour réaliser que cela se passe bien. Ceci tient au fait, que la partie matrice identité est implicite.
+
+Le code Julia, ainsi que le contructeur associé est ci-dessous:
+"""
+
+# ╔═╡ 3d469d0a-723d-449a-bce2-80833f26b8c8
+# A new type of scalar 
+struct AFloat64 <: Real
+    i::Int
+    v::Float64
+
+	function AFloat64(v::Real)
+	    # When a variable is created one must add an empty row 
+    	# (the "identity" part).
+    	push!(tape, [])
+    	i = length(tape)
+
+    	new(i, Float64(v))
+	end
+
+	AFloat64(i::Int, v::Float64) = new(i,v)
+end
+
+# ╔═╡ 98053b26-9545-4f75-a49e-84be153b9af1
+md"""
+**Demonstration:** on déclare deux variables `x=2` et `y=3` et l'on affiche la "cassette", qui ne contient pour l'instant que deux lignes vides.
+"""
+
+# ╔═╡ 6770e01c-ca6d-45e3-a3a8-48797e338679
+let
+	resize!(tape,0)
+	x=AFloat64(2.0)
+	y=AFloat64(3.0)
+	
+	x, y, tape
+end
+
+# ╔═╡ 76728ec4-b159-4aed-a9d2-c597143546cf
+md"""
+### Mise en oeuvre pour $\sin()$
+
+Comme
+```math
+d(\sin(x_i))=\cos(x_i)dx_i
+```
+la surcharge de la fonction sinus s'écrit:
+"""
+
+# ╔═╡ 78a9374b-5543-4bb1-8e0a-ff5d58667b71
+begin
+	import Base: sin
+	
+	function sin(a::AFloat64)
+    	d = [∂iϕ(a.i, cos(a.v))] # <- dϕ = [0,…,0, ∂ₖsin(xₖ),0,…0]
+    	push!(tape, d) # <- enregistrement de la ligne dans la "cassette"
+
+    	i = length(tape) # création de la nouvelle variable xₖ₊₁ = sin(xₖ) 
+    	v = sin(a.v)
+    	AFloat64(i, v)      
+	end
+end
+
+# ╔═╡ 8efe8f97-f17a-4163-a89b-934c423999d8
+md"""
+### Mise en oeuvre pour $+, \times, \dots$
+"""
+
+# ╔═╡ a405c213-f0ac-4df6-818a-abd1b52000fb
+md"""
+Comme $d(x_i + x_j) = dx_i + dx_j$, alors
+"""
+
+# ╔═╡ 5b219ef8-0cbe-40a6-beed-335735a07d1b
+begin
+	import Base: (+)
+	
+	function (+)(a::AFloat64, b::AFloat64)
+    	d = [∂iϕ(a.i, 1.0), ∂iϕ(b.i, 1.0)]
+    	push!(tape, d)
+
+    	i = length(tape)
+    	v = a.v + b.v
+	    AFloat64(i, v)
+	end
+end
+
+# ╔═╡ a76bc54a-7ed3-49fe-b8b5-82c8ac33b1e7
+let
+	f(x)=sin(x)
+	err(f′,x0)=abs(f′-cos(x0))
+	h = 10 .^ range(-17, -1, length=500)
+	x0 = 1
+	y = map(h->err( (f(x0+h)-f(x0))/h, x0), h)
+	
+	fig = lines(h, y,
+		axis=(xscale=log10, yscale = log10,
+		    xlabel="h",ylabel="ϵ",
+		    title=L"\epsilon=\mid\frac{\sin(1+h)-\sin(1)}{h}-\cos(1)\mid"))
+	
+    fig
+end
+
+# ╔═╡ 63f891da-12ed-4813-be9e-b08cd6c274cb
+md"""
+Comme $d(x_i \times x_j)= x_jdx_i + x_idx_j$, alors:
+"""
+
+# ╔═╡ 89f2fecf-d07f-44e0-b39d-fbb6c509fbf6
+begin
+	import Base: (*)
+	
+	function (*)(a::AFloat64, b::AFloat64)
+    	d = [∂iϕ(b.i, a.v), ∂iϕ(a.i, b.v)]
+	    push!(tape, d)
+
+	    i = length(tape)
+	    v = a.v * b.v
+	    AFloat64(i, v)
+	end
+end
+
+# ╔═╡ e9d11e1f-501c-49f3-bfca-2a9d5fc236b1
+# In-place computation of ...∘dΦ₂∘dΦ₁⋅δ
+function forward!(δ::Vector)
+    n = length(tape)
+
+    for i = 1:n
+        for ∂iϕ in tape[i]
+            δ[i] += ∂iϕ.∂ * δ[∂iϕ.i]
+        end
+    end
+
+    δ
+end
+
+# ╔═╡ 55a5e351-e1eb-4600-b032-bc144c75b037
+# In-place computation of ...Φn-1^t∘Φn^t.δ
+function backward!(δ::Vector)
+    n = length(tape)
+
+    for i = n:-1:1
+        s = δ[i]
+        for ∂iϕ in tape[i]
+            δ[∂iϕ.i] += ∂iϕ.∂ * s
+        end
+    end
+
+    δ
+end
+
+# ╔═╡ 295942c8-0ef5-4c1a-bf99-561e4b4597c1
+md"""
+!!! exemple "Remarque"
+    Pour être exaustif, il faudrait également définir les opérations "mixtes":
+    - `Float64 + AFloat64`, `AFloat64 + Float64`
+	- `Float64 × AFloat64`, `AFloat64 × Float64`
+    - ...
+    Cela ne réprésente pas de difficultés particulières.
+"""
+
+# ╔═╡ d2011efa-d26c-4ed1-9688-bca52334c3bf
+md"""
+## Illustration 
+"""
+
+# ╔═╡ 423af97b-79ff-4fc8-8b67-26901b33ac50
+begin
+	resize!(tape,0)
+	
+	x=AFloat64(2.0)
+	y=AFloat64(3.0)
+
+	z = x + sin(x*y)	
+end
+
+# ╔═╡ a7c2573a-19a2-4d4b-91a1-116e6d1e7c6a
+md"""
+La "cassette" a enregistré, 
+1. declaration de `x`
+2. declaration de `y`
+3. declaration de `x*y`
+4. declaration de `sin(x*y)`
+5. declaration de `x+sin(x*y)`
+"""
+
+# ╔═╡ 99173920-cb95-4a02-9d95-41cf04459183
+tape
+
+# ╔═╡ b94d5517-2b3a-4014-87be-8c258c104e02
+md"""
+Pour calculer le gradient de $z(x,y)$ on crée un vecteur $e_i$ où $i$ est l'indice de $z$ et on utilise le mode backward.
+"""
+
+# ╔═╡ c0f4fe11-c149-43e8-afa8-962a035b8b15
+let
+	v=zeros(length(tape))
+	v[z.i]=1
+
+	z, backward!(v)
+end
+
+# ╔═╡ d6d76209-a5ba-4f0b-ab30-7632ed091ce5
+md"""
+Vérification: si $z=x+\sin(xy)$, alors $\nabla z = (1+y\cos(xy),x\cos(xy))$. Si $x=2, y=3$ on obtient $z=1.72058$ et $\nabla z=(3.88051,1.92034)$
+"""
+
+# ╔═╡ 5eccbecc-519f-4a3c-80d6-cd77e118d024
+md"""
+## Encapsulation des routines & "Syntactic sugar"
+
+Il s'agit d'encapsuler les procédures précédentes afin de rendre leur usage plus pratique.
+
+On procède en deux temps:
+1. une première encapsulation qui cache la création du vecteur $e_i$ et l'extraction de la valeur des dérivées
+2. une seconde encapsulation qui cache toute référence au type `AFloat64`
+"""
+
+# ╔═╡ 5691d49f-b2ec-4c24-ba5e-a1eee8f59476
+md"""
+### Premier temps
+"""
+
+# ╔═╡ a2e5fa68-1657-448f-95f1-60d4118f4def
+# Calcule ∇z
+function gradient(z::AFloat64,wrt::AbstractVector{AFloat64})
+	v=zeros(length(tape)) # Création de eᵢ
+	v[z.i]=1
+	
+	backward!(v) # Mode backward
+
+	map(wrt->v[wrt.i],wrt) # Extraction des dérivées
+end
+
+# ╔═╡ 84159453-6daa-4304-a9f2-b370391059c7
+md"""
+Calcul du gradient $\nabla z$ par rapport à $x, y$
+"""
+
+# ╔═╡ c9c4f960-2d1b-4131-a3c3-bc722c365aa9
+# Calcule ∂ⱼz
+function derivatives_wrt(z::AbstractVector{AFloat64},wrt::AFloat64)
+   v=zeros(length(tape)) # Création de eᵢ
+   v[wrt.i]=1
+
+   forward!(v)	# Mode forward
+	
+   map(z->v[z.i],z) # Extraction des dérivées
+end   
+
+# ╔═╡ 43a0026a-77d7-437d-b154-9baa1bcf0f80
+md"""
+Calcul des derivées de toutes les grandeurs par rapport à x
+- $\partial_x x = 1$
+- $\partial_x y = 0$
+- $\partial_x z = \partial_x (x+\sin(xy)) = 1+y\cos(xy) = 3.88051$
+"""
+
+# ╔═╡ 83745652-35b3-42c8-bc77-61485fb2250f
+derivatives_wrt([x,y,z],x)
+
+# ╔═╡ 0d335e76-d3c6-4591-ac43-dae5188e0400
+md"""
+### Second temps
+"""
+
+# ╔═╡ 2952fb74-a351-493f-841f-466392382d89
+md"""
+Une fonction utilisée pour la démonstation
+"""
+
+# ╔═╡ dccc8320-f60f-4849-8ef1-ec3a1990e629
+function foo(X::AbstractVector{<:Real})
+  X[1]+sin(X[1]*X[2])
+end
+
+# ╔═╡ 366f8aa3-696c-4068-804f-28ebbd8b1bbb
+md"""
+Encapsulation "user friendly" du calcul du gradient. 
+
+Le type `AFloat64` n'apparait plus.
+"""
+
+# ╔═╡ 3b072230-fdc4-4153-bf55-30e6dc6e63f5
+function gradient(f::Function,X::AbstractVector{<:AbstractFloat})
+	resize!(tape,0) # Efface l'ancienne "cassette"
+	X = map(Xᵢ->AFloat64(Xᵢ),X) # Transforme les Float64 en AFloat64
+	z = f(X) # Execute f en utilisant des scalaires de type AFloat64
+	gradient(z,X) # Retourne le gradient
+end
+
+# ╔═╡ 6ef4ce4f-8ca5-4c76-9c13-a56fc6099773
+gradient(z,[x,y])
+
+# ╔═╡ 8d789020-4c1e-4802-a220-2551af74b373
+md"""
+**Démonstration:** 
+l'avantage ici est que toute référence au type AFloat64 est cachée. L'utilisateur ne sait "même pas" que l'on calcule le gradient en utilisant la différentiation automatique.
+"""
+
+# ╔═╡ 62d2e70b-c99b-43be-9f39-f67377d1855c
+gradient(foo,[2.0,3.0])
+
+# ╔═╡ 1ae1300f-e194-4f13-9dc5-6c94d15fe9e0
+md"""
+# Avantages/inconvenients
+
+## Avantages
+
+- Implementation facile & unifiée des modes forward et backward
+- Il est possible de faire des "cassettes" imbriquées pour calculer les dérivations d'ordre supérieur.
+
+Exemples de librairies:
+- [Mission Impossible C++](https://github.com/vincent-picaud/MissionImpossible)
+- [Stan](https://mc-stan.org/users/interfaces/math.html)
+- [Adept C++](https://github.com/rjhogan/Adept)
+
+## Inconvénients
+- pour le mode forward on n'est pas obligé d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
+  - [autodiff C++](https://github.com/autodiff/autodiff)
+  - [ForwardDiff.jl Julia](https://github.com/JuliaDiff/ForwardDiff.jl)
+- travail au niveau des scalaires, ce qui bloque en particulier l'usage de librairies telles que BLAS ou LAPACK 
+
+### 'dot' exemple
+Pour l'algèbre linéaire dense, les librairies BLAS, LAPACK sont utilisées.
+
+Elles définissent des fonctions optimisée pour les opérations courantes, telle que le calcul de $\langle x,y \rangle$:
+
+```C
+double cblas_ddot (const int n, 
+                   const double *x, const int incx, 
+                   const double *y, const int incy);
+```
+
+!!! note "Attention" 
+    Si l'on travaille au niveaux "scalaire", les operations matricielles ne bénificient plus de BLAS & LAPACK -> important overhead (pénalité $> \times 10$ + allocations mémoires)
+"""
+
+# ╔═╡ 2628ace2-b983-4c97-8598-e118675df304
+bench_blas_dot = let 
+	x = Float64[2.0,3.0]
+
+	@benchmark dot($x,$x)
+end
+
+# ╔═╡ 62dc62c3-ee4b-4148-aa1a-6d048fbec40d
+bench_autodiff_dot = let 
+	x = AFloat64[2.0,3.0]
+
+	@benchmark dot($x,$x)
+end
+
+# ╔═╡ 2bd03e6a-1038-43bd-9065-17938b853374
+md"""
+On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'éxecution.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
+BenchmarkTools = "~1.3.1"
 CairoMakie = "~0.7.4"
-ForwardDiff = "~0.10.25"
-PlutoUI = "~0.7.37"
+PlutoUI = "~0.7.35"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -145,9 +1082,9 @@ uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
 [[deps.ArrayInterface]]
 deps = ["Compat", "IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
-git-tree-sha1 = "d49f55ff9c7ee06930b0f65b1df2bfa811418475"
+git-tree-sha1 = "745233d77146ad221629590b6d82fe7f1ddb478f"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "4.0.4"
+version = "4.0.3"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -166,6 +1103,12 @@ version = "1.0.1"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[deps.BenchmarkTools]]
+deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
+git-tree-sha1 = "4c10eee4af024676200bc7752e536f858c6b8f93"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "1.3.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -244,17 +1187,11 @@ git-tree-sha1 = "417b0ed7b8b838aa6ca0a87aadf1bb9eb111ce40"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.8"
 
-[[deps.CommonSubexpressions]]
-deps = ["MacroTools", "Test"]
-git-tree-sha1 = "7b8a93dba8af7e3b42fecabf646260105ac373f7"
-uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
-version = "0.3.0"
-
 [[deps.Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "96b0bc6c52df76506efc8a441c6cf1adcb1babc4"
+git-tree-sha1 = "44c37b4636bc54afac5c574d2d02b625349d6582"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.42.0"
+version = "3.41.0"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -296,18 +1233,6 @@ git-tree-sha1 = "80c3e8639e3353e5d2912fb3a1916b8455e2494b"
 uuid = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
 version = "0.4.0"
 
-[[deps.DiffResults]]
-deps = ["StaticArrays"]
-git-tree-sha1 = "c18e98cba888c6c25d1c3b048e4b3380ca956805"
-uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
-version = "1.0.3"
-
-[[deps.DiffRules]]
-deps = ["IrrationalConstants", "LogExpFunctions", "NaNMath", "Random", "SpecialFunctions"]
-git-tree-sha1 = "dd933c4ef7b4c270aacd4eb88fa64c147492acf0"
-uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
-version = "1.10.0"
-
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
@@ -330,9 +1255,9 @@ uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[deps.DualNumbers]]
 deps = ["Calculus", "NaNMath", "SpecialFunctions"]
-git-tree-sha1 = "90b158083179a6ccbce2c7eb1446d5bf9d7ae571"
+git-tree-sha1 = "84f04fe68a3176a583b864e492578b9466d87f1e"
 uuid = "fa6b7ba4-c1ee-5f82-b5fc-ecf0adba8f74"
-version = "0.6.7"
+version = "0.6.6"
 
 [[deps.EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -366,9 +1291,9 @@ version = "4.4.0+0"
 
 [[deps.FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
-git-tree-sha1 = "505876577b5481e50d089c1c68899dfb6faebc62"
+git-tree-sha1 = "463cb335fa22c4ebacfd1faba5fde14edb80d96c"
 uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "1.4.6"
+version = "1.4.5"
 
 [[deps.FFTW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -384,9 +1309,9 @@ version = "1.13.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
-git-tree-sha1 = "0dbc5b9683245f905993b51d2814202d75b34f1a"
+git-tree-sha1 = "4c7d3757f3ecbcb9055870351078552b7d1dbd2d"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.13.1"
+version = "0.13.0"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -405,12 +1330,6 @@ deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
 uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.4.2"
-
-[[deps.ForwardDiff]]
-deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "LogExpFunctions", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "1bd6fc0c344fc0cbee1f42f8d2e7ec8253dda2d2"
-uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.25"
 
 [[deps.FreeType]]
 deps = ["CEnum", "FreeType2_jll"]
@@ -438,9 +1357,9 @@ version = "1.0.10+0"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
-git-tree-sha1 = "83ea630384a13fc4f002b77690bc0afeb4255ac9"
+git-tree-sha1 = "58bcdf5ebc057b085e58d95c138725628dd7453c"
 uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
-version = "0.4.2"
+version = "0.4.1"
 
 [[deps.Gettext_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
@@ -563,9 +1482,9 @@ version = "0.5.3"
 
 [[deps.InverseFunctions]]
 deps = ["Test"]
-git-tree-sha1 = "91b5dcf362c5add98049e6c29ee756910b03051d"
+git-tree-sha1 = "a7254c0acd8e62f1ac75ad24d5db43f5f19f3c65"
 uuid = "3587e190-3f89-42d0-90ee-14403ec27112"
-version = "0.1.3"
+version = "0.1.2"
 
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "7fd44fd4ff43fc60815f8e764c0f352b83c49151"
@@ -700,24 +1619,18 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "3f7cb7157ef860c637f3f4929c8ed5d9716933c6"
+git-tree-sha1 = "e5718a00af0ab9756305a0392832c8952c7426c1"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.7"
+version = "0.3.6"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
-git-tree-sha1 = "e595b205efd49508358f7dc670a940c790204629"
+git-tree-sha1 = "5455aef09b40e5020e1520f551fa3135040d4ed0"
 uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2022.0.0+0"
-
-[[deps.MacroTools]]
-deps = ["Markdown", "Random"]
-git-tree-sha1 = "3d3e902b31198a27340d0bf00d6ac452866021cf"
-uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.9"
+version = "2021.1.1+2"
 
 [[deps.Makie]]
 deps = ["Animations", "Base64", "ColorBrewer", "ColorSchemes", "ColorTypes", "Colors", "Contour", "Distributions", "DocStringExtensions", "FFMPEG", "FileIO", "FixedPointNumbers", "Formatting", "FreeType", "FreeTypeAbstraction", "GeometryBasics", "GridLayoutBase", "ImageIO", "IntervalSets", "Isoband", "KernelDensity", "LaTeXStrings", "LinearAlgebra", "MakieCore", "Markdown", "Match", "MathTeXEngine", "Observables", "OffsetArrays", "Packing", "PlotUtils", "PolygonOps", "Printf", "Random", "RelocatableFolders", "Serialization", "Showoff", "SignedDistanceFields", "SparseArrays", "StaticArrays", "Statistics", "StatsBase", "StatsFuns", "StructArrays", "UnicodeFun"]
@@ -885,9 +1798,9 @@ version = "1.50.3+0"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "85b5da0fa43588c75bb1ff986493443f821c70b7"
+git-tree-sha1 = "13468f237353112a01b2d6b32f3d0f80219944aa"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.2.3"
+version = "2.2.2"
 
 [[deps.Pixman_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -913,9 +1826,9 @@ version = "1.1.3"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
-git-tree-sha1 = "bf0a1121af131d9974241ba53f601211e9303a9e"
+git-tree-sha1 = "85bf3e4bd279e405f91489ce518dedb1e32119cb"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.37"
+version = "0.7.35"
 
 [[deps.PolygonOps]]
 git-tree-sha1 = "77b3d3605fc1cd0b42d95eba87dfcd2bf67d5ff6"
@@ -931,6 +1844,10 @@ version = "1.2.4"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[deps.Profile]]
+deps = ["Printf"]
+uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
 [[deps.ProgressMeter]]
 deps = ["Distributed", "Printf"]
@@ -960,9 +1877,9 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[deps.Ratios]]
 deps = ["Requires"]
-git-tree-sha1 = "dc84268fe0e3335a62e315a3a7cf2afa7178a734"
+git-tree-sha1 = "01d341f502250e81f6fec0afe662aa861392a3aa"
 uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
-version = "0.4.3"
+version = "0.4.2"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -997,9 +1914,9 @@ version = "0.3.0+0"
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[deps.SIMD]]
-git-tree-sha1 = "7dbc15af7ed5f751a82bf3ed37757adf76c32402"
+git-tree-sha1 = "39e3df417a0dd0c4e1f89891a281f82f5373ea3b"
 uuid = "fdea26ae-647d-5447-a871-4b548cad5224"
-version = "3.4.1"
+version = "3.4.0"
 
 [[deps.ScanByte]]
 deps = ["Libdl", "SIMD"]
@@ -1065,9 +1982,9 @@ version = "0.1.1"
 
 [[deps.Static]]
 deps = ["IfElse"]
-git-tree-sha1 = "65068e4b4d10f3c31aaae2e6cb92b6c6cedca610"
+git-tree-sha1 = "00b725fffc9a7e9aac8850e4ed75b4c1acbe8cd2"
 uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
-version = "0.5.6"
+version = "0.5.5"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
@@ -1118,10 +2035,10 @@ uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
 version = "1.0.1"
 
 [[deps.Tables]]
-deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "OrderedCollections", "TableTraits", "Test"]
-git-tree-sha1 = "5ce79ce186cc678bbb5c5681ca3379d1ddae11a1"
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
+git-tree-sha1 = "bb1064c9a84c52e277f1096cf41434b675cd368b"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.7.0"
+version = "1.6.1"
 
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
@@ -1294,17 +2211,68 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─d2685db7-b922-48fd-944b-0cd4a521ce4c
-# ╟─e12ba51c-8ffb-470d-b682-54d15c31740c
-# ╟─9158c15e-7c02-4bda-8d6a-ed8b7561cc99
-# ╠═eeb8fa92-9f8d-11ec-2edf-fda09d802ef7
-# ╠═cc2e3332-c6aa-4619-af4d-84f401410463
-# ╟─a163fc32-b0b3-46bb-a30e-532fb27c31bd
-# ╠═b25cb7d7-3b00-4389-af8c-0e1ccf5e803d
-# ╠═53ab660e-8cd5-4151-8073-9284a479f540
-# ╠═18ed4b1f-a85e-412e-b24e-711bab54960c
-# ╠═91604bb8-1865-460d-90aa-350c3496ff63
-# ╟─caf9dfaa-1793-4108-864d-61c75e13b7e3
-# ╟─e73127a1-2a6d-4e46-8186-ce626ba2f2ea
+# ╟─ce235e96-6bf8-4601-847b-808cd0d06261
+# ╟─c827ef5e-c184-4e06-9d0f-fb4a22a71266
+# ╟─b8371073-56c9-4075-b16e-8f17b0b93d9b
+# ╟─cffc3edc-1806-444e-aecc-373e869dfddb
+# ╟─89843eb3-9bac-4924-a98b-63b0c3d42697
+# ╟─3c9ff7f2-6b4c-4d0a-9bc3-e719504b7f1e
+# ╟─a76bc54a-7ed3-49fe-b8b5-82c8ac33b1e7
+# ╟─579249f9-e7d8-4097-b358-7d410a1b0d87
+# ╟─adfafc42-1dc5-4ba1-8922-bd300423540b
+# ╟─a5046c2e-1d37-4a89-9c34-f0c961592f94
+# ╟─88fc447e-007d-4eca-811f-badf024578cd
+# ╟─f3309a59-d96e-42d3-be7a-3bb124619741
+# ╟─c08c6755-342b-4c0e-a00e-c15f84c1bf83
+# ╟─286f2fe1-443e-430b-8549-fb65c2bc224d
+# ╟─f2f50bb5-a42d-4701-ae29-d9e2539e5136
+# ╟─c97b2d9c-fd4f-4502-8482-aa6db5b05325
+# ╟─f72ec959-a3aa-420a-bf12-bc61f63a6d65
+# ╟─176e0e85-dacc-4c06-ad1a-30adf486ce3d
+# ╠═18b26595-be3e-4f29-bcc0-96bdf3fdb6db
+# ╠═d7a484d1-f54c-4ef2-8cde-d48c1d1e3be2
+# ╟─a48c6a8f-e0c5-4679-9c85-727861ee9f24
+# ╠═e9d11e1f-501c-49f3-bfca-2a9d5fc236b1
+# ╟─65177381-acd6-4f11-ae47-bd942903e608
+# ╠═55a5e351-e1eb-4600-b032-bc144c75b037
+# ╟─8132cc8c-2ca1-49af-8322-b53660d8cbb5
+# ╠═3d469d0a-723d-449a-bce2-80833f26b8c8
+# ╟─98053b26-9545-4f75-a49e-84be153b9af1
+# ╠═6770e01c-ca6d-45e3-a3a8-48797e338679
+# ╟─76728ec4-b159-4aed-a9d2-c597143546cf
+# ╠═78a9374b-5543-4bb1-8e0a-ff5d58667b71
+# ╟─8efe8f97-f17a-4163-a89b-934c423999d8
+# ╟─a405c213-f0ac-4df6-818a-abd1b52000fb
+# ╠═5b219ef8-0cbe-40a6-beed-335735a07d1b
+# ╟─63f891da-12ed-4813-be9e-b08cd6c274cb
+# ╠═89f2fecf-d07f-44e0-b39d-fbb6c509fbf6
+# ╟─295942c8-0ef5-4c1a-bf99-561e4b4597c1
+# ╠═d2011efa-d26c-4ed1-9688-bca52334c3bf
+# ╠═423af97b-79ff-4fc8-8b67-26901b33ac50
+# ╟─a7c2573a-19a2-4d4b-91a1-116e6d1e7c6a
+# ╠═99173920-cb95-4a02-9d95-41cf04459183
+# ╟─b94d5517-2b3a-4014-87be-8c258c104e02
+# ╠═c0f4fe11-c149-43e8-afa8-962a035b8b15
+# ╟─d6d76209-a5ba-4f0b-ab30-7632ed091ce5
+# ╟─5eccbecc-519f-4a3c-80d6-cd77e118d024
+# ╟─5691d49f-b2ec-4c24-ba5e-a1eee8f59476
+# ╠═a2e5fa68-1657-448f-95f1-60d4118f4def
+# ╟─84159453-6daa-4304-a9f2-b370391059c7
+# ╠═6ef4ce4f-8ca5-4c76-9c13-a56fc6099773
+# ╠═c9c4f960-2d1b-4131-a3c3-bc722c365aa9
+# ╟─43a0026a-77d7-437d-b154-9baa1bcf0f80
+# ╠═83745652-35b3-42c8-bc77-61485fb2250f
+# ╟─0d335e76-d3c6-4591-ac43-dae5188e0400
+# ╟─2952fb74-a351-493f-841f-466392382d89
+# ╠═dccc8320-f60f-4849-8ef1-ec3a1990e629
+# ╟─366f8aa3-696c-4068-804f-28ebbd8b1bbb
+# ╠═3b072230-fdc4-4153-bf55-30e6dc6e63f5
+# ╟─8d789020-4c1e-4802-a220-2551af74b373
+# ╠═62d2e70b-c99b-43be-9f39-f67377d1855c
+# ╟─1ae1300f-e194-4f13-9dc5-6c94d15fe9e0
+# ╠═7c079152-43a9-4290-81b4-04788a4eb3bc
+# ╠═2628ace2-b983-4c97-8598-e118675df304
+# ╠═62dc62c3-ee4b-4148-aa1a-6d048fbec40d
+# ╟─2bd03e6a-1038-43bd-9065-17938b853374
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

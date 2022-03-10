@@ -1,16 +1,27 @@
+#+OPTIONS: H:3 toc:t num:t \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:t tags:not-in-toc 
 #+title: Some Pluto notebooks (Julia language)
 
 Some [[https://github.com/fonsp/Pluto.jl][Pluto]] notebooks with the aim of illustrating various algorithms.
-See [[https://vincent-picaud.github.io/Some_Pluto_notebooks][notebook list]].
 
-The template I use is [[https://juliapluto.github.io/static-export-template/][here]].
+See [[https://vincent-picaud.github.io/Some_Pluto_notebooks][the raw notebook list]] or below: 
 
 * Table of contents
 
 ** Misc
-
-- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Pluto_tips.html][Pluto_tips]] :: some tips related to Pluto notebooks.
+** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Pluto_tips.html][Pluto_tips]]
+Some tips related to Pluto notebooks.
 
 ** Spectrometry
+*** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/snip.html][snip.jl]]
+Baseline computation using the SNIP algorithm.
 
-- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/snip.html][snip.jl]] :: compute baseline using the SNIP algorithm.
+* Autodiff
+
+** Une introduction
+Des slides que j'ai fait pour une introduction (en français):
+1. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_introduction.html][AutoDiff_Slides/pluto_ad_introduction.jl]]
+2. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_approche_directe.html][AutoDiff_Slides/pluto_ad_approche_directe.jl]]
+
+** Reproduced results
+*** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/min_without_backpropagation.html][min_without_backpropagation.jl]]
+Related to: https://arxiv.org/abs/2202.08587
