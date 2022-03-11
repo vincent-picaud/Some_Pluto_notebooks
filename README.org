@@ -19,8 +19,10 @@ Baseline computation using the SNIP algorithm.
 
 ** Une introduction
 Des slides que j'ai fait pour une introduction (en français):
-1. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_introduction.html][AutoDiff_Slides/pluto_ad_introduction.jl]]
-2. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_approche_directe.html][AutoDiff_Slides/pluto_ad_approche_directe.jl]]
+1. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_introduction.html][AutoDiff_Slides/pluto_ad_introduction.jl]] : présentation forward/backward avec une cassette,
+2. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_approche_directe.html][AutoDiff_Slides/pluto_ad_approche_directe.jl]] : simplification du mode forward,
+3. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_Levenberg.html][AutoDiff_Slides/pluto_ad_Levenberg.jl]] : limite hors sujet, une note
+   sur les moindres carrés non-linéaires (Levenberg-Marquardt).
 
 ** Reproduced results
 *** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/min_without_backpropagation.html][min_without_backpropagation.jl]]
