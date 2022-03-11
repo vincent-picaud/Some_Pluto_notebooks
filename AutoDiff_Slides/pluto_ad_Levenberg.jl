@@ -29,7 +29,7 @@ md"""
 md"""
 !!! note "Punch line..."
 
-    Bien que cela soit un problème d'optimisation il est généralement préférable d'utiliser le mode direct...
+    Bien que cela soit un problème d'optimisation il est généralement préférable d'utiliser le mode direct... + un petit détour par les dérivés d'ordre supérieur.
 """
 
 # ╔═╡ b0de615f-6707-42fb-b44b-20f6ee2d819b
@@ -154,9 +154,10 @@ On souhaite trouver les deux paramètres $\mu$ et $\sigma$ d'un pic Gaussien
 
 # ╔═╡ 9db0e5b7-d075-4556-be23-fdb11f24de77
 begin 
-	θ_true = Float64[50,3] # μ=θ[1], σ=θ[2]
-	θ_init = Float64[30,10]
-	peak(x,θ) = exp(-1/2*((x-θ[1])/θ[2])^2) 
+	θ_true = Float64[50,40] # h=θ[1], μ=θ[2]
+	θ_init = Float64[10,10]
+	#peak(x,θ) = θ[1]*exp(-1/2*((x-θ[2])/5)^2) 
+	peak(x,θ) = exp(-(x-θ[1])/θ[2]) 
 	
 	X=collect(Float64,1:0.5:100)
 	Y_true=map(x->peak(x,θ_true),X)
@@ -169,7 +170,7 @@ begin
 	let
 		fig = Figure()
 		ax = Axis(fig[1,1])
-		plot!(X,Y_noisy,label="raw")
+		plot!(X,Y_noisy,label="raw",color = RGBAf(0.1, 0.1, 0.1, 0.3), markersize=5)
 		lines!(X,Y_true,label="true")
 		lines!(X,Y_init,label="init")
 		axislegend(ax)
@@ -180,7 +181,9 @@ end
 
 # ╔═╡ 22e08b80-2dbf-48ed-a730-f120367bf769
 md"""
-Par commodité, on encapsule $r$ et $J$, calculé par le mode forward, comme expliqué précédement
+Par commodité, on encapsule les calculs de $r$ et $J$. 
+
+Ce dernier est calculé par le mode forward, comme expliqué précédement.
 """
 
 # ╔═╡ dad7611f-bc13-4667-8430-56d17b532a22
@@ -191,14 +194,14 @@ end
 
 # ╔═╡ 35cacf60-b29b-43d0-848d-5d97e3099bda
 md"""
-Un implémentation simpliste de Levenberg-Marquardt
+Un implémentation assez "grossiere" de la méthode de Levenberg-Marquardt
 """
 
 # ╔═╡ 646defeb-451c-46fb-bc22-e576d49e5e5d
 function lm(residue,Jac,θ)
 	r,J = residue(θ),Jac(θ)
 	∇F,H = J'*r,J'*J
-	μ = 0.001*maximum(abs.(H)) # damping
+	μ = 0.01*maximum(abs.(H)) # damping
 	ν = 1
 	ϵ = 1e-8
 	
@@ -208,10 +211,10 @@ function lm(residue,Jac,θ)
 		if norm(δθ)<ϵ
 			break;
 		end
-		δL = 1/2*dot(δθ,μ*δθ-∇F)
+		δL = 1/2*dot(δθ,μ*δθ-∇F) 
 		θ_new = θ + δθ
 		r_new = residue(θ_new)
-		δF = 1/2*dot(r-r_new,r+r_new)
+		δF = 1/2*dot(r-r_new,r+r_new) 
 		ρ = δF/δL
 		if ρ>0
 			θ = θ_new
@@ -225,10 +228,19 @@ function lm(residue,Jac,θ)
 			μ=μ*ν
 			ν=2*ν
 		end
-		println("iter= $i, $μ |∇F|= $(norm(∇F)), θ= $θ")
+		println("iter= $i,|∇F|= $(norm(∇F)), θ= $θ")
 	end
 	θ
 end 
+
+# ╔═╡ 7d90f46c-989b-4abd-8eee-1ae4bfb39491
+md"""
+Pour mémoire:
+- θ initial = [$(θ_init)]
+- θ vrai    = [$(θ_true)]
+
+Ci dessous, le résultat du fit:
+"""
 
 # ╔═╡ 465fb84f-9a9e-4a65-b22b-7e0f06f7f910
 with_terminal() do
@@ -239,44 +251,28 @@ end
 let
 	θ_fit = lm(r,J,θ_init)
 	Y_true=map(x->peak(x,θ_true),X)
-	Y_init=map(x->peak(x,θ_init),X)
 	Y_fit =map(x->peak(x,θ_fit),X)
 
 	fig = Figure()
 	ax = Axis(fig[1,1])
-	plot!(X,Y_noisy,label="raw")
-	lines!(X,Y_true,label="true")
-	lines!(X,Y_init,label="init")
+	plot!(X,Y_noisy,label="raw",color = RGBAf(0.1, 0.1, 0.1, 0.3), markersize=5)
 	lines!(X,Y_fit,label="fit")
+	lines!(X,Y_init,label="init")
 	axislegend(ax)
 	
 	fig
 end
 
-# ╔═╡ 06a2e735-64fb-4f65-a735-3c0363ae45b4
-θ_fit = lm(r,J,θ_init)
+# ╔═╡ e84c3d37-1597-4100-a169-63a7434f62a0
+md"""
+# Références
 
-# ╔═╡ 4ea98b7c-2ba3-419b-afa5-e1fbc905e821
-norm(r(θ_fit)),norm(r(θ_init))
+Un incontournable à lire en premier:
 
-# ╔═╡ c3c45923-2397-4cac-aad4-1c2d76948597
-plot(r(θ_fit))
+[Kaj Madsen and Hans Bruun Nielsen and Ole Tingleff, Methods for Non-Linear Least Squares Problems](http://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf)
 
-# ╔═╡ a2a9a994-dd7a-4120-8fd9-ab92ddaa7fd8
-plot(r(θ_init))
-
-# ╔═╡ 137d0382-df20-468f-a9bb-ad4c5e8aa6f1
-ForwardDiff.jacobian(θ->residue(Y,X,θ),θ_true)
-
-# ╔═╡ d224eb56-2dc2-45bf-96d9-2cbf781a349c
-begin
-	plot(X,Y)
-	lines!(current_axis(), X,2*Y)
-	current_figure()
-end
-
-# ╔═╡ 3fa25b25-cc54-4703-9cd0-2cea437b6ad1
-curren
+Sinon, j'ai un paquet Juilia [NLS_Solver.jl](https://github.com/vincent-picaud/NLS_Solver.jl) avec une implémentation plus soignée, qui supporte également les problèmes avec contraintes de borne.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1485,7 +1481,7 @@ version = "3.5.0+0"
 # ╟─ff9b5796-a12d-11ec-175e-498afad11f6c
 # ╟─0ca095fb-8d30-445a-aeb9-ddae24c65645
 # ╟─a787387f-6e65-45bd-a0b3-0fee730454e1
-# ╠═b0de615f-6707-42fb-b44b-20f6ee2d819b
+# ╟─b0de615f-6707-42fb-b44b-20f6ee2d819b
 # ╟─bebd7535-6b3e-471c-a31b-b8ee55d957b0
 # ╟─3675b8bb-68ea-4204-9b02-26cbe9148059
 # ╟─723fe95d-5e7c-4126-989d-cda094948bd5
@@ -1495,16 +1491,11 @@ version = "3.5.0+0"
 # ╠═9db0e5b7-d075-4556-be23-fdb11f24de77
 # ╟─22e08b80-2dbf-48ed-a730-f120367bf769
 # ╠═dad7611f-bc13-4667-8430-56d17b532a22
-# ╠═35cacf60-b29b-43d0-848d-5d97e3099bda
+# ╟─35cacf60-b29b-43d0-848d-5d97e3099bda
 # ╠═646defeb-451c-46fb-bc22-e576d49e5e5d
+# ╟─7d90f46c-989b-4abd-8eee-1ae4bfb39491
 # ╠═465fb84f-9a9e-4a65-b22b-7e0f06f7f910
-# ╠═54a36de9-445b-48ed-9dbd-0f28c07b768c
-# ╠═06a2e735-64fb-4f65-a735-3c0363ae45b4
-# ╠═4ea98b7c-2ba3-419b-afa5-e1fbc905e821
-# ╠═c3c45923-2397-4cac-aad4-1c2d76948597
-# ╠═a2a9a994-dd7a-4120-8fd9-ab92ddaa7fd8
-# ╠═137d0382-df20-468f-a9bb-ad4c5e8aa6f1
-# ╠═d224eb56-2dc2-45bf-96d9-2cbf781a349c
-# ╠═3fa25b25-cc54-4703-9cd0-2cea437b6ad1
+# ╟─54a36de9-445b-48ed-9dbd-0f28c07b768c
+# ╟─e84c3d37-1597-4100-a169-63a7434f62a0
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
