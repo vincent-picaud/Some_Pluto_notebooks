@@ -16,9 +16,11 @@ end
 md"""
 # Goal
 
-Reproduce some results of [Gradients without Backpropagation](https://arxiv.org/abs/2202.08587)
+Reproduces some results of [Gradients without Backpropagation](https://arxiv.org/abs/2202.08587)
 
-A simple idea that seems to work. Uses a gradient projected random direction that only requires forward mode (and not backpropagation). 
+A simple idea that seems to work : 
+
+Use a random direction  $v\sim \mathcal{N}(0,I)$ gradient projected  $g(\theta) = \langle\nabla f(\theta), v\rangle v$. This only requires forward mode (and not backpropagation). Show that $\mathbb{E}[g(\theta)]=\nabla f(\theta)$ and use it in a gradient descent algorithm.
 """
 
 # ╔═╡ 9158c15e-7c02-4bda-8d6a-ed8b7561cc99
@@ -78,9 +80,17 @@ md"""
 
 # ╔═╡ e73127a1-2a6d-4e46-8186-ce626ba2f2ea
 let f=f_Beal
+
+	function get_range(x;r=0.1,l=100)
+		x_min = minimum(x)
+		x_max = maximum(x)
+		x_min -= r*abs(x_min)
+		x_max += r*abs(x_max)
+		collect(range(x_min,x_max,length=l))
+	end
 	
-	x = collect(0:0.1:3)
-	y = collect(-0.4:0.1:0.6)
+	x = get_range(iterate[:,1])
+	y = get_range(iterate[:,2])
 	z  = [f([xi,yj]) for xi in x, yj in y]  
 
 	# plot
@@ -1297,7 +1307,7 @@ version = "3.5.0+0"
 # ╟─d2685db7-b922-48fd-944b-0cd4a521ce4c
 # ╟─e12ba51c-8ffb-470d-b682-54d15c31740c
 # ╟─9158c15e-7c02-4bda-8d6a-ed8b7561cc99
-# ╠═eeb8fa92-9f8d-11ec-2edf-fda09d802ef7
+# ╟─eeb8fa92-9f8d-11ec-2edf-fda09d802ef7
 # ╠═cc2e3332-c6aa-4619-af4d-84f401410463
 # ╟─a163fc32-b0b3-46bb-a30e-532fb27c31bd
 # ╠═b25cb7d7-3b00-4389-af8c-0e1ccf5e803d
