@@ -114,7 +114,9 @@ En notant $J$ la Jacobienne de $r$ en $\theta$, on vient de montrer que :
 F(\theta+\delta\theta) \approx F(\theta) + \langle J^t r(\theta), \delta\theta \rangle + \frac{1}{2}\left( \langle J^t J \delta\theta, \delta\theta \rangle + \langle r(\theta), d^2r_{|\theta}\cdot (\delta\theta,\delta\theta)\rangle\right)
 ```
 
-On constate qu'il y a deux types de problèmes, ceux où le résidu $\|r(\theta)\|$ reste important et les plus classiques où il est faible, au moins proche de la solution. Il existe des méthodes numériques différentes selon la catégorie. Si le résidu est faible, on peut prendre le modèle ci-dessous 
+On constate qu'il y a deux catégories de problème, ceux où le résidu $\|r(\theta)\|$ reste important même proche de la solution et les plus classiques où il est faible, proche de la solution. Il existe des méthodes numériques spécialisées selon le type de problème.
+
+Si le résidu est faible, on peut prendre le modèle ci-dessous 
 ```math
 F(\theta+\delta\theta) \approx F(\theta) + \langle J^t r(\theta), \delta\theta \rangle + \frac{1}{2} \langle J^t J \delta\theta, \delta\theta \rangle
 ```
@@ -124,11 +126,11 @@ et utiliser la méthode de Levenberg-Marquardt classique.
 # ╔═╡ 8e92baa6-dd27-4635-b5c5-66d7395f61e8
 md"""
 !!! note "CAVEAT"
-    La méthode est généralement présenté en prenant une version linéarisée du résidu:
+    La méthode est parfois présentée en prenant une version linéarisée du résidu:
     ```math
     r(\theta+\delta\theta) \approx r(\theta) + J \delta\theta 
     ```
-    et en remplaçant dans une version linéarisé de $F$ : 
+    et en remplaçant dans une version linéarisée de $F$ : 
     ```math
     \begin{align}
     F(\theta+\delta\theta) &\approx \frac{1}{2}\langle r(\theta) + J\delta\theta , r(\theta) + J\delta\theta \rangle \\
@@ -142,14 +144,22 @@ md"""
 md"""
 ## Et l'autodiff dans tout ça?
 
-Ici, bien que l'on ai un problème d'optimisation, il ne faut pas calculer le gradient, mais toute la Jacobienne $J$. En pratique, si $J$ est de dimension $n_s\times m_\theta$, $n_s$ représente le nombre de points $(x_k,y_k)$ de la régression et $m_\theta$ le nombre de paramètres du modèle. On est classiquement dans le cas où $m_\theta \ll n_s$, il faut donc calculer les $m_\theta$ colonnes par le mode **forward**.
+Ici, bien que l'on ait un problème d'optimisation, il ne faut pas calculer le gradient, mais toute la Jacobienne $J$. En pratique, si $J$ est de dimension $n_s\times m_\theta$, $n_s$ représente le nombre de points $(x_k,y_k)$ de la régression et $m_\theta$ le nombre de paramètres du modèle. On est classiquement dans le cas où $m_\theta \ll n_s$, il faut donc calculer les $m_\theta$ colonnes par le mode **forward**.
 """
 
 # ╔═╡ 5e330f3f-d578-4cee-9adf-9e1f1f0b619c
 md"""
 # Exemple
 
-On souhaite trouver les deux paramètres $\mu$ et $\sigma$ d'un pic Gaussien
+On souhaite faire une régression avec un modèle $m(x,\theta)$ de la forme :
+```math
+m(x,\theta) = \exp{\left(-\frac{x-\theta_1}{\theta_2}\right)}
+```
+
+Le résidue $r$ est alors défini par 
+```math
+r_i(\theta) = y_i - m(x_i,\theta),\ i=1,\dots, n_S
+```
 """
 
 # ╔═╡ 9db0e5b7-d075-4556-be23-fdb11f24de77
@@ -267,7 +277,7 @@ end
 md"""
 # Références
 
-Un incontournable à lire en premier:
+Un incontournable, à lire en premier:
 
 [Kaj Madsen and Hans Bruun Nielsen and Ole Tingleff, Methods for Non-Linear Least Squares Problems](http://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf)
 
@@ -1488,13 +1498,13 @@ version = "3.5.0+0"
 # ╟─8e92baa6-dd27-4635-b5c5-66d7395f61e8
 # ╟─cd213e1d-0558-4951-8c80-fe31d9491e71
 # ╟─5e330f3f-d578-4cee-9adf-9e1f1f0b619c
-# ╠═9db0e5b7-d075-4556-be23-fdb11f24de77
+# ╟─9db0e5b7-d075-4556-be23-fdb11f24de77
 # ╟─22e08b80-2dbf-48ed-a730-f120367bf769
 # ╠═dad7611f-bc13-4667-8430-56d17b532a22
 # ╟─35cacf60-b29b-43d0-848d-5d97e3099bda
 # ╠═646defeb-451c-46fb-bc22-e576d49e5e5d
 # ╟─7d90f46c-989b-4abd-8eee-1ae4bfb39491
-# ╠═465fb84f-9a9e-4a65-b22b-7e0f06f7f910
+# ╟─465fb84f-9a9e-4a65-b22b-7e0f06f7f910
 # ╟─54a36de9-445b-48ed-9dbd-0f28c07b768c
 # ╟─e84c3d37-1597-4100-a169-63a7434f62a0
 # ╟─00000000-0000-0000-0000-000000000001
