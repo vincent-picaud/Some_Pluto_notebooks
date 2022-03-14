@@ -14,7 +14,9 @@ Some tips related to Pluto notebooks.
 ** Spectrometry
 *** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/snip.html][snip.jl]]
 Baseline computation using the SNIP algorithm.
-
+* Linear algebra
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/LinAlg/matrix_of_given_rank.html][matrix_of_given_rank.jl]] create matices of size n x m and rank k
+   
 * Autodiff
 
 ** Une introduction
