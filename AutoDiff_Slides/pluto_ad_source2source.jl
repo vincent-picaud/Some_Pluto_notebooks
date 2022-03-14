@@ -5,13 +5,26 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 26f7c8b8-aae7-4c77-8bab-b0237faa8e05
-using PlutoUI
+begin
+	using PlutoUI
+	
+	PlutoUI.TableOfContents(aside=true)
+end
+
+# ╔═╡ d7782c4b-223a-4215-93a3-eb3e47b92a76
+md"""
+!!! exemple ""
+    **Introduction à la Différentiation Automatique (source to source)**
+    
+	vincent.picaud@cea.fr
+"""
+
 
 # ╔═╡ 8166813a-9baf-11ec-1b24-8d4c2f0f9a61
 md"""
-!!! example ""
-    # Différentiation Automatique (... fin)
-    vincent.picaud@cea.fr
+**Points abordés :**
+
+- quelques références sur les approches de type source → source (pour l'instant très succinct).
 """
 
 # ╔═╡ d64e1704-5ab1-45c4-adcf-77ec2422c47a
@@ -20,13 +33,14 @@ md"""
 
 On n'utilise plus la définition de type dédiés, comme avant, mais on essaie de transformer directement le programme. Il faut analyser le programme initial et en déduire un programme associé où sont calculées les dérivées.
 
-D'une facon générale ceci est beaucoup plus compliqué que les approches de type "operator overloading" précédentes.
+D'une façon générale ceci est beaucoup plus compliqué que les approches de type "operator overloading" précédentes.
 
-Deux niveaux possibles:
+Deux niveaux possibles :
 - adresser des languages de haut niveau, C, Fortran... Inconvénient, compliqué...
   
   Exemple:
-  - [Tapenade (C, Fortran)](http://www-tapenade.inria.fr:8080/tapenade/index.jsp)
+  - [Tapenade (C, Fortran)](http://www-tapenade.inria.fr:8080/tapenade/index.jsp) INRIA (subset of C, Fortran)
+  - [Clad (C++ subset)](https://github.com/vgvassilev/clad) développé par le Cern, agit au niveau AST du C++ (plugin clang)
 
 
 - adresser des languages de bas niveau, par exemple IR de LLVM. Avantage, structure du language plus simple, indépendance vis-à-vis du language initial. C'est à mon avis **la voix de l'avenir**.
@@ -101,7 +115,7 @@ md"""
 
 Nécessitµe de recompiler `clang` (plugin). 
 
-IMHO la documentation n'est pas facile d'accès/peu fournie. L'usage reste délicat.
+IMHO la documentation n'est pas facile d'accès/peu fournie...
 
 ```C
 #include <stdio.h>
@@ -126,7 +140,7 @@ int main() {
 md"""
 ## Demo Zygote (Julia)
 
-Bien intégré et fonctionnel
+Bien intégré et fonctionnel. Inconvénient ne supporte pas les mutations.
 
 ```julia
 using LinearAlgebra, Zygote
@@ -352,6 +366,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─26f7c8b8-aae7-4c77-8bab-b0237faa8e05
+# ╟─d7782c4b-223a-4215-93a3-eb3e47b92a76
 # ╟─8166813a-9baf-11ec-1b24-8d4c2f0f9a61
 # ╟─d64e1704-5ab1-45c4-adcf-77ec2422c47a
 # ╟─0cbd116a-fd38-4aea-b697-d50571d2afd9
