@@ -27,9 +27,9 @@ md"""
 
 # ╔═╡ a787387f-6e65-45bd-a0b3-0fee730454e1
 md"""
-!!! note "Punch line..."
-
-    Bien que cela soit un problème d'optimisation il est généralement préférable d'utiliser le mode direct... + un petit détour par les dérivés d'ordre supérieur.
+**Points abordés:**
+- présentation de la dérivée d'ordre 2,
+- bien que l'on ait un problème d'optimisation, c'est le mode **forward** qui est pertinant.
 """
 
 # ╔═╡ b0de615f-6707-42fb-b44b-20f6ee2d819b
@@ -41,7 +41,7 @@ md"""
 md"""
 ## Introduction & idée de base
 
-L'objectif est de résoudre un problème de la forme:
+L'objectif est de résoudre un problème de la forme :
 
 ```math
 \arg\min_\theta \left( F(\theta) = \frac{1}{2}\|r(\theta)\|^2 \right)
