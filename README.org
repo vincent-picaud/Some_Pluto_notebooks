@@ -8,22 +8,26 @@ See [[https://vincent-picaud.github.io/Some_Pluto_notebooks][the raw notebook li
 * Table of contents
 
 ** Misc
-** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Pluto_tips.html][Pluto_tips]]
-Some tips related to Pluto notebooks.
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Misc/Pluto_tips.html][Misc/Pluto_tips.jl]] some tips related to Pluto notebooks.
 
 ** Spectrometry
-*** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/snip.html][snip.jl]]
-Baseline computation using the SNIP algorithm.
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Spectrometry/snip.html][Spectrometry/snip.jl]] baseline computation using the SNIP algorithm.
 
-* Autodiff
+** Linear algebra
+- [[https://vincent-picaud.github.io/Some_Pluto_notebooks/LinAlg/matrix_of_given_rank.html][LinAlg/matrix_of_given_rank.jl]] create matrices of size n x m and
+  rank k.
+   
+** AutoDiff
 
-** Une introduction
+*** Une introduction
 Des slides que j'ai fait pour une introduction (en français):
 1. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_introduction.html][AutoDiff_Slides/pluto_ad_introduction.jl]] : présentation forward/backward avec une cassette,
 2. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_approche_directe.html][AutoDiff_Slides/pluto_ad_approche_directe.jl]] : simplification du mode forward,
-3. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_Levenberg.html][AutoDiff_Slides/pluto_ad_Levenberg.jl]] : limite hors sujet, une note
+3. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_source2source.html][AutoDiff_Slides/pluto_ad_source2source.jl]] : quelques mots sur les
+   approches de type source -> source,
+4. [[https://vincent-picaud.github.io/Some_Pluto_notebooks/AutoDiff_Slides/pluto_ad_Levenberg.html][AutoDiff_Slides/pluto_ad_Levenberg.jl]] : limite hors sujet, une note
    sur les moindres carrés non-linéaires (Levenberg-Marquardt).
 
-** Reproduced results
-*** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/min_without_backpropagation.html][min_without_backpropagation.jl]]
+** Reproduced results from articles
+*** [[https://vincent-picaud.github.io/Some_Pluto_notebooks/Articles/gradient_without_backpropagation.html][Articles/gradient_without_backpropagation.jl]]
 Related to: https://arxiv.org/abs/2202.08587
