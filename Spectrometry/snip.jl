@@ -30,7 +30,7 @@ The SNIP algorithm is used in spectrometry. It computes a baseline.
 
 Although it works well in practice, AFAIK there is no real theory behind this algorithm.
 
-**TODO:** gives more details about the aogorithm... For the moment this notebook goal is to test rendereding.
+**TODO :** gives more details about the algorithm... 
 """
 
 # ╔═╡ 96072ae5-19ce-42f2-8dfa-b1c068ba7935
@@ -39,7 +39,7 @@ md"""
 """
 
 # ╔═╡ 04776871-603c-4bfc-b39e-1379090f28f7
-X, Y = eachcol(readdlm("data/gamma_spectrum.txt",Float32));
+X, Y = eachcol(readdlm("../data/gamma_spectrum.txt",Float32));
 
 # ╔═╡ e54c2169-e1a9-4f7a-8980-9355a765803a
 md"""
