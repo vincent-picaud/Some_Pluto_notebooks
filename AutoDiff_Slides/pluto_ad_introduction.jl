@@ -47,7 +47,7 @@ Non recommandée en général :
   \end{align*}
   ```
   il faut ajouter la lenteur du calcul formel (manipulation d'arbres, heuristiques...)
-- Problématique pour différentier un code général : boucles, branchements etc...
+- Problématique pour différentier un code informatique, avec des boucles, des branchements etc...
 ```julia
 function f(x)
 	if x<0
@@ -90,7 +90,7 @@ Il s'agit de calculer $\sin'(1)$ en utilisant
 
 !!! remark "Remarque"
     En pratique si l'on doit vraiment utiliser les différences finies, on prend      
-    $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les `Float64`, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
+    $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les Float64, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
 """
 
 # ╔═╡ 579249f9-e7d8-4097-b358-7d410a1b0d87
@@ -120,7 +120,7 @@ md"""
 ## Définition
 
 !!! definition "Différentielle"
-    Une fonction $f$ est différentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire bornée, notée $df_{|x}$, telle que :
+    Une fonction $f$ est différentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire continue, notée $df_{|x}$, telle que :
     ```math
 	f(x+\delta x) = f(x) + df_{|x}\cdot \delta x + o(\|\delta x\|)
     ```
@@ -218,10 +218,10 @@ md"""
 ## Gradient
 
 Contrairement à la différentielle, pour définir un gradient il faut un **produit scalaire** (espace de Hilbert). L'existence du gradient
-découle du théorème de représentation de Ritz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
+découle du théorème de représentation de Riesz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
 
 !!! definition "Vecteur gradient"
-    Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Ritz, il existe donc un vecteur $v_x$ tel 		que :
+    Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Riesz, il existe donc un vecteur $v_x$ tel 		que :
 	```math
 	df_{|x}\cdot \delta x  =\langle v_x , \delta x \rangle
 	```
@@ -298,6 +298,17 @@ En particulier pour calculer le gradient, il suffit d'évaluer $J^t\cdot \mathbf
 !!! note "Au risque d'insister..."
     Le gradient est un **vecteur**, mais c'est une **ligne** de la Jacobienne.
 
+"""
+
+# ╔═╡ d4330d4f-58a0-4727-b5f1-c94d32e7f8ec
+md"""
+### Référence
+
+S'il ne faut en citer qu'une, alors c'est:
+
+Cartan, Henri, and Joseph Kouneiher. Cours de calcul différentiel. Paris: Hermann, 2007. 
+
+Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1975).
 """
 
 # ╔═╡ 286f2fe1-443e-430b-8549-fb65c2bc224d
@@ -633,7 +644,7 @@ Pour implémenter le mode **direct**, il faut ensuite être en mesure de calcule
 \end{align}
 ```
 
-La structure des matrices $d\Phi_k$ permet de réaliser cette opération surplace :
+La structure des matrices $d\Phi_k$ permet de réaliser cette opération surplace. La procédure suivante calcule $\delta\leftarrow d\Phi_N\circ\dots \circ d\Phi_1\cdot \delta$.
 """
 
 # ╔═╡ 65177381-acd6-4f11-ae47-bd942903e608
@@ -661,7 +672,7 @@ d\Phi^t_k=
 \right)
 ```
 
-permet de réaliser cette opération surplace :
+permet de réaliser cette opération surplace. La procédure suivante calcule $\delta\leftarrow d\Phi_1^t\circ\dots \circ d\Phi_N^t\cdot \delta$.
 """
 
 # ╔═╡ 8132cc8c-2ca1-49af-8322-b53660d8cbb5
@@ -2224,6 +2235,7 @@ version = "3.5.0+0"
 # ╟─88fc447e-007d-4eca-811f-badf024578cd
 # ╟─f3309a59-d96e-42d3-be7a-3bb124619741
 # ╟─c08c6755-342b-4c0e-a00e-c15f84c1bf83
+# ╟─d4330d4f-58a0-4727-b5f1-c94d32e7f8ec
 # ╟─286f2fe1-443e-430b-8549-fb65c2bc224d
 # ╟─f2f50bb5-a42d-4701-ae29-d9e2539e5136
 # ╟─c97b2d9c-fd4f-4502-8482-aa6db5b05325

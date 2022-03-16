@@ -27,6 +27,56 @@ md"""
 # Approche directe
 """
 
+# ╔═╡ a3c76871-a056-40b9-8d01-151546b5a7e0
+md"""
+## Rappel sur les $dx$, $dy$ etc...
+
+On rappelle ici ce que représente $dx$, $dy$ etc... 
+
+Soient $X=\left(\begin{array}{c}a\\b\end{array}\right)\in\mathbb{R}^2$ et les 		applications coordonnées $\mathrm{p}^i$ : 
+
+```math
+\mathrm{p}^1(X)=(1\  0)\cdot X
+```
+```math
+\mathrm{p}^2(X)=(0\ 1)\cdot X
+```
+**Remarque :** si l'on regroupe les $\mathrm{p}^i$, l'application $\mathrm{p}$ est simplement l'identité $\mathrm{p}=\mathrm{Id}$.
+
+Ce sont des applications linéaires, donc :
+```math
+\mathrm{dp}^1=(1,\  0),\ \ \mathrm{dp}^2=(0,\ 1),\ \mathrm{dp}=\mathrm{Id}
+```
+
+Si l'on considère $f:\mathbb{R}^2\rightarrow R$, alors :
+```math
+f(a,b)=f(\mathrm{p}^1(X),\mathrm{p}^2(X))=f\circ \mathrm{p}(X)
+```
+la règle de la chaine donne 
+```math
+\begin{align}
+\mathrm{d}(f\circ \mathrm{p})\cdot \delta X &= \mathrm{d}f\circ \mathrm{dp} \cdot \delta X \\
+&= 
+\left(\begin{array}{cc}\partial_1 f & \partial_2 f \end{array}\right)\cdot \left(\begin{array}{cc}1 & 0 \\ 0 & 1 \end{array}\right) \cdot \delta X \\
+    &= \partial_1 f\ \left(\begin{array}{cc}1 & 0 \end{array}\right) \cdot \delta X + \partial_2 f\ \left(\begin{array}{cc}0 & 1 \end{array}\right) \cdot \delta X \\
+    &= \partial_1 f\ \underbrace{\mathrm{dp}^1 \cdot \delta X}_{\mathrm{d}x} + \partial_2 f\ \underbrace{\mathrm{dp}^2 \cdot \delta X }_{\mathrm{d}y}
+\end{align}
+```
+ce qui est traditionnellement noté 
+```math
+\mathrm{d}f = \partial_x f\ \mathrm{d}x + 	\partial_y f\ \mathrm{d}y
+```
+ou encore [1]
+```math
+\mathrm{d}f = \partial_1 f\ \mathrm{d}^1 + \partial_2 f\ \mathrm{d}^2
+```
+Dans tous les cas **les $\mathrm{d}^i$ sont simplement les différentielles des applications coordonnées $\mathrm{p}^i$**.
+
+---
+
+1. [Bossavit, Alain. (1991). Differential Geometry for the student of numerical methods in Electromagnetism](https://www.researchgate.net/publication/200018385_Differential_Geometry_for_the_student_of_numerical_methods_in_Electromagnetism)
+"""
+
 # ╔═╡ 2540688c-81be-4fe7-89b5-9976f44152e8
 md"""
 ## Principe de l'approche
@@ -45,35 +95,9 @@ La règle de la chaine conduit à :
 \end{align}
 ```
 
-On rappelle que pour une application $\Phi: \mathbb{R}^m\rightarrow\mathbb{R}$, alors $\mathrm{d}\Phi$ est une forme linéaire de $\mathbb{R}^m$ sur $\mathbb{R}$. La base (duale) de cet espace est constituée des **covecteurs** $\mathrm{d}^i$, projections de $x\in\mathbb{R}^m$ sur sa i-èm composante, soit $x^i$. 
+La formule $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n \partial_j \Phi\ \mathrm{d}\varphi^{\,j}$ est le cas général où les applications coordonnées $\mathrm{p}^i$ ont remplacées par des applications quelconques $\varphi^i$. 
 
-!!! exemple "Tutorial... les dx, dy... etc"
-    Soient $X=\left(\begin{array}{c}a\\b\end{array}\right)\in\mathbb{R}^2$ et les 		applications coordonnées $\mathrm{p}^i$ : $\mathrm{p}^1(X)=a$ et 					$\mathrm{p}^2(X)=b$. Ceci s'écrit :
-	```math
-	\mathrm{p}^1(X)=(1,\  0)\cdot X,\ \ \mathrm{p}^2(X)=(0,\ 1)\cdot X,\      			\mathrm{remarque}\ \mathrm{p}(X)=\mathrm{Id}\cdot X
-	```
-    Ce sont des applications linéaires, donc :
-	```math
-	\mathrm{dp}^1=(1,\  0),\ \ \mathrm{dp}^2=(0,\ 1),\ \mathrm{dp}=\mathrm{Id}
-	```
-    Si l'on considère $f:\mathbb{R}^2\rightarrow R$, alors :
-    ```math
-	f(a,b)=f(\mathrm{p}^1(X),\mathrm{p}^2(X))=f\circ \mathrm{p}(X)
-    ```
-    la règle de la chaine donne 
-    ```math
-    \begin{align}
-    \mathrm{d}(f\circ \mathrm{p})\cdot \delta X &= \mathrm{d}f\circ \mathrm{dp} \cdot \delta X \\
-    &= 
-    \left(\begin{array}{cc}\partial_1 f & \partial_2 f \end{array}\right)\cdot \left(\begin{array}{cc}1 & 0 \\ 0 & 1 \end{array}\right) \cdot \delta X \\
-    &= \partial_1 f\ \left(\begin{array}{cc}1 & 0 \end{array}\right) \cdot \delta X + \partial_2 f\ \left(\begin{array}{cc}0 & 1 \end{array}\right) \cdot \delta X \\
-    &= \partial_1 f\ \mathrm{dp}^1 \cdot \delta X + \partial_2 f\ \mathrm{dp}^2 \cdot \delta X 
-    \end{align}
-    ```
-    ... ce qui est traditionnellement noté $\mathrm{d}f = \partial_x f\ \mathrm{d}x + 	\partial_y f\ \mathrm{d}y$ (bien que $\mathrm{d}f = \partial_1 f\ \mathrm{d}^1 	+ 	\partial_2 f\ \mathrm{d}^2$ soit plus correcte), mais dans tous les cas 	**les 		$\mathrm{d}^i$ sont simplement les différentielles des applications 		
-	coordonnées $\mathrm{p}^i$**.
-
-    **Remarque :** la formule du début, $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n 	\partial_j \Phi\ \mathrm{d}\varphi^{\,j}$, est le cas général où les 				$\mathrm{p}^i$ sont remplacées par des applications quelconques $\varphi^i$. 	
+On rappelle que pour une application $\Phi: \mathbb{R}^m\rightarrow\mathbb{R}$, alors $\mathrm{d}\Phi$ est une forme linéaire de $\mathbb{R}^m$ sur $\mathbb{R}$. La base (duale) de cet espace est constituée des **covecteurs** $\mathrm{d}^i$, projections de $x\in\mathbb{R}^m$ sur sa i-èm composante, soit $x^i$. Cette remarque est le fondement de l'approche directe proposée ici. Cela va s'éclaircir grâce à l'exemple qui suit.
 """
 
 # ╔═╡ ed6b55b4-882a-475b-8829-a788fa3d6108
@@ -82,20 +106,38 @@ md"""
 
 On va appliquer la formule $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n \partial_j \Phi\  \mathrm{d}\varphi^{\,j}$ à l'exemple $z=x+\sin(xy)$
 
-Les covecteurs $\mathrm{d}x, \mathrm{d}y$ ont pour composantes $(1,0)$ et $(0,1)$. Si l'on applique la formule à $(x,y)\mapsto xy$ on trouve les composantes du covecteur $\mathrm{d}((x,y)\mapsto xy)$) qui sont $y\ (1,0) + x\ (0,1) = (y,x)$. On poursuit de la même façon...
+Les covecteurs $\mathrm{d}x, \mathrm{d}y$ ont pour composantes $(1\ 0)$ et $(0\ 1)$ dans le dual engendré par $\{\mathrm{d}x, \mathrm{d}y\}$.
+
+La premiere étape est le calcul de $\mathrm{d}(xy)=y\mathrm{d}x+x\mathrm{d}y$. En utilisant la formule précédente et en terme de composantes on a :
+```math
+\mathrm{d}(xy) = y\ (1\ 0) + x\ (0\ 1) = (y\ x)
+```
+
+On poursuit de la même façon...
+
 ```math
 \begin{align}
-\mathrm{d}x &\leadsto (1,0) \\
-\mathrm{d}y &\leadsto (0,1)\\
-\mathrm{d}(xy) &\leadsto y\ (1,0)+x\ (0,1) = (y,x) \\
-\mathrm{d}(\sin(xy)) &\leadsto \cos(xy)\ (y,x) = (y\cos(xy),x\cos(xy))\\
-\mathrm{d}(x+\sin(xy)) &\leadsto 1\ (1,0) + 1\ (y\cos(xy),x\cos(xy)) = (1+y\cos(xy),x\cos(xy))\\
+\mathrm{d}x &\leadsto (1\ 0) \\
+\mathrm{d}y &\leadsto (0\ 1)\\
+\mathrm{d}(xy) &\leadsto y\ (1\ 0)+x\ (0\ 1) = (y\ x) \\
+\mathrm{d}(\sin(xy)) &\leadsto \cos(xy)\ (y\ x) = (y\cos(xy)\ x\cos(xy))\\
+\mathrm{d}(x+\sin(xy)) &\leadsto 1\ (1\ 0) + 1\ (y\cos(xy)\ x\cos(xy)) = (1+y\cos(xy)\ x\cos(xy))\\
 \end{align}
 ```
 On obtient le résultat attendu :
 ```math
 d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + (y\cos(xy))\mathrm{d}y
 ```
+
+!!! note "gradient avec le mode forward ?!?"
+    On vient le calculer le gradient avec l'approche forward. Cependant bien avoir à l'esprit que le calcul précédent cache 2 calculs simultanés : un par composante, ici 
+	```math
+	\begin{align}
+	\mathrm{d}x &\leadsto (1\ 0) \\
+	\mathrm{d}y &\leadsto (0\ 1)\\
+	\end{align}
+	```
+	ce qui posserait un réel problème d'efficacité si l'on avait un grand nombre de variables indépendantes...
 
 !!! remark "Et les \"Dual numbers\"..."
     L'approche précédente est simple et "directe". On peut recourir aux "dual 		numbers", pour faire exactement le même genre de calculs, mais la justification 	emmène beaucoup plus loin [Smooth infinitesimal analysis](https://en.wikipedia.org/wiki/Smooth_infinitesimal_analysis). L'idée est d'introduire un nombre $\epsilon$ tel que $\epsilon^2=0$, on a alors $f(a+\epsilon b)=f(a)+ϵf'(a)b$. C'est une réminiscence des infiniments petits de Leibniz où les termes d'ordre supérieur sont négligés $(dx)^2=0$. 
@@ -107,8 +149,7 @@ md"""
 
 L'implémentation suit exactement le cheminement précédent. À tout scalaire on associe un covecteur. 
 
-En termes d'optimisation, afin d'éviter des allocations dynamiques, on utilise un vecteur statique. Si le nombre de variables est trop important, on découpe ce vecteur en plusieurs morceaux et on relance les calculs plusieurs fois. 
-```
+En termes d'optimisation, afin d'éviter des allocations dynamiques, on utilise un vecteur statique. Si le nombre de variables est trop important, on découpe ce vecteur en plusieurs morceaux et on relance les calculs plusieurs fois (ou en parallèle, car ce sont des calculs indépendants).
 """
 
 # ╔═╡ 803d756b-2e35-42f3-ae9f-6798e4d82d27
@@ -565,6 +606,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─45ee7653-8bdf-472d-aa39-7a5be5f03dbe
 # ╟─841ab7fb-aefb-434d-8d60-db585132dd19
 # ╟─64776627-30c6-4ee1-8df3-6be2829bd9c2
+# ╟─a3c76871-a056-40b9-8d01-151546b5a7e0
 # ╟─2540688c-81be-4fe7-89b5-9976f44152e8
 # ╟─ed6b55b4-882a-475b-8829-a788fa3d6108
 # ╟─1989ee2c-3dfb-4fcd-862d-71c0f3a868d9
