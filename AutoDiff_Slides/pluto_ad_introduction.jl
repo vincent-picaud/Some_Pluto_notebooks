@@ -90,7 +90,7 @@ Il s'agit de calculer $\sin'(1)$ en utilisant
 
 !!! remark "Remarque"
     En pratique si l'on doit vraiment utiliser les différences finies, on prend      
-    $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les `Float64`, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
+    $h$ de l'ordre de $h\approx x_0 \sqrt{\epsilon}$. Pour les Float64, $\epsilon \approx       10^{-16}$, donc $h\approx 10^{-8}$.
 """
 
 # ╔═╡ 579249f9-e7d8-4097-b358-7d410a1b0d87
@@ -120,7 +120,7 @@ md"""
 ## Définition
 
 !!! definition "Différentielle"
-    Une fonction $f$ est différentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire bornée, notée $df_{|x}$, telle que :
+    Une fonction $f$ est différentiable (dérivée de Frechet) en $x$ s'il existe une application linéaire continue, notée $df_{|x}$, telle que :
     ```math
 	f(x+\delta x) = f(x) + df_{|x}\cdot \delta x + o(\|\delta x\|)
     ```
@@ -218,10 +218,10 @@ md"""
 ## Gradient
 
 Contrairement à la différentielle, pour définir un gradient il faut un **produit scalaire** (espace de Hilbert). L'existence du gradient
-découle du théorème de représentation de Ritz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
+découle du théorème de représentation de Riesz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
 
 !!! definition "Vecteur gradient"
-    Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Ritz, il existe donc un vecteur $v_x$ tel 		que :
+    Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Riesz, il existe donc un vecteur $v_x$ tel 		que :
 	```math
 	df_{|x}\cdot \delta x  =\langle v_x , \delta x \rangle
 	```
@@ -633,7 +633,7 @@ Pour implémenter le mode **direct**, il faut ensuite être en mesure de calcule
 \end{align}
 ```
 
-La structure des matrices $d\Phi_k$ permet de réaliser cette opération surplace :
+La structure des matrices $d\Phi_k$ permet de réaliser cette opération surplace. La procédure suivante calcule $\delta\leftarrow d\Phi_N\circ\dots \circ d\Phi_1\cdot \delta$.
 """
 
 # ╔═╡ 65177381-acd6-4f11-ae47-bd942903e608
@@ -661,7 +661,7 @@ d\Phi^t_k=
 \right)
 ```
 
-permet de réaliser cette opération surplace :
+permet de réaliser cette opération surplace. La procédure suivante calcule $\delta\leftarrow d\Phi_1^t\circ\dots \circ d\Phi_N^t\cdot \delta$.
 """
 
 # ╔═╡ 8132cc8c-2ca1-49af-8322-b53660d8cbb5
