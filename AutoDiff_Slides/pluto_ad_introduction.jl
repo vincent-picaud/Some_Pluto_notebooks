@@ -302,7 +302,7 @@ En particulier pour calculer le gradient, il suffit d'évaluer $J^t\cdot \mathbf
 
 # ╔═╡ d4330d4f-58a0-4727-b5f1-c94d32e7f8ec
 md"""
-### Référence
+## Référence
 
 S'il ne faut en citer qu'une, alors c'est:
 
