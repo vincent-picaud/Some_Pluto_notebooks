@@ -47,7 +47,7 @@ Non recommandée en général :
   \end{align*}
   ```
   il faut ajouter la lenteur du calcul formel (manipulation d'arbres, heuristiques...)
-- Problématique pour différentier un code général : boucles, branchements etc...
+- Problématique pour différentier un code informatique, avec des boucles, des branchements etc...
 ```julia
 function f(x)
 	if x<0
@@ -298,6 +298,17 @@ En particulier pour calculer le gradient, il suffit d'évaluer $J^t\cdot \mathbf
 !!! note "Au risque d'insister..."
     Le gradient est un **vecteur**, mais c'est une **ligne** de la Jacobienne.
 
+"""
+
+# ╔═╡ d4330d4f-58a0-4727-b5f1-c94d32e7f8ec
+md"""
+### Référence
+
+S'il ne faut en citer qu'une, alors c'est:
+
+Cartan, Henri, and Joseph Kouneiher. Cours de calcul différentiel. Paris: Hermann, 2007. 
+
+Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1975).
 """
 
 # ╔═╡ 286f2fe1-443e-430b-8549-fb65c2bc224d
@@ -2224,6 +2235,7 @@ version = "3.5.0+0"
 # ╟─88fc447e-007d-4eca-811f-badf024578cd
 # ╟─f3309a59-d96e-42d3-be7a-3bb124619741
 # ╟─c08c6755-342b-4c0e-a00e-c15f84c1bf83
+# ╟─d4330d4f-58a0-4727-b5f1-c94d32e7f8ec
 # ╟─286f2fe1-443e-430b-8549-fb65c2bc224d
 # ╟─f2f50bb5-a42d-4701-ae29-d9e2539e5136
 # ╟─c97b2d9c-fd4f-4502-8482-aa6db5b05325
