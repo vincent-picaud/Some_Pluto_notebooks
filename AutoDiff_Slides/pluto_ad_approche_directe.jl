@@ -106,27 +106,33 @@ md"""
 
 On va appliquer la formule $\mathrm{d}(\Phi\circ\varphi) = \sum_{j=1}^n \partial_j \Phi\  \mathrm{d}\varphi^{\,j}$ à l'exemple $z=x+\sin(xy)$
 
-Les covecteurs $\mathrm{d}x, \mathrm{d}y$ ont pour composantes $(1\ 0)$ et $(0\ 1)$ dans le dual engendré par $\{\mathrm{d}x, \mathrm{d}y\}$.
+Les covecteurs $\mathrm{d}x, \mathrm{d}y$ ont pour composantes $(1, 0)$ et $(0, 1)$ dans le dual engendré par $\{\mathrm{d}x, \mathrm{d}y\}$.
 
-La premiere étape est le calcul de $\mathrm{d}(xy)=y\mathrm{d}x+x\mathrm{d}y$. En utilisant la formule précédente et en terme de composantes on a :
+La premiere étape est le calcul de 
 ```math
-\mathrm{d}(xy) = y\ (1\ 0) + x\ (0\ 1) = (y\ x)
+\mathrm{d}((x,y)\mapsto xy)=y\mathrm{d}x+x\mathrm{d}y
+```
+En utilisant la formule précédente et en terme de composantes on a :
+```math
+\mathrm{d}((x,y)\mapsto xy) = y\ (1, 0) + x\ (0, 1) = (y, x)
 ```
 
 On poursuit de la même façon...
 
 ```math
 \begin{align}
-\mathrm{d}x &\leadsto (1\ 0) \\
-\mathrm{d}y &\leadsto (0\ 1)\\
-\mathrm{d}(xy) &\leadsto y\ (1\ 0)+x\ (0\ 1) = (y\ x) \\
-\mathrm{d}(\sin(xy)) &\leadsto \cos(xy)\ (y\ x) = (y\cos(xy)\ x\cos(xy))\\
-\mathrm{d}(x+\sin(xy)) &\leadsto 1\ (1\ 0) + 1\ (y\cos(xy)\ x\cos(xy)) = (1+y\cos(xy)\ x\cos(xy))\\
+\mathrm{d}x &\leadsto (1, 0) \\
+\mathrm{d}y &\leadsto (0, 1)\\
+\mathrm{d}((x,y)\mapsto xy) &\leadsto y\ (1, 0)+x\ (0, 1) = (y, x) \\
+\mathrm{d}(xy\mapsto\sin(xy)) &\leadsto \cos(xy)\ (y, x) \\
+&= (y\cos(xy), x\cos(xy))\\
+\mathrm{d}((x,\sin(xy))\mapsto x+\sin(xy)) &\leadsto 1\ (1\ 0) + 1\ (y\cos(xy)\ \ x\cos(xy)) \\
+&= (1+y\cos(xy), x\cos(xy))\\
 \end{align}
 ```
 On obtient le résultat attendu :
 ```math
-d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + (y\cos(xy))\mathrm{d}y
+d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + x\cos(xy)\mathrm{d}y
 ```
 
 !!! note "gradient avec le mode forward ?!?"
