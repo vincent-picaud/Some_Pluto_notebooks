@@ -123,10 +123,10 @@ On poursuit de la même façon...
 \begin{align}
 \mathrm{d}x &\leadsto (1, 0) \\
 \mathrm{d}y &\leadsto (0, 1)\\
-\mathrm{d}((x,y)\mapsto xy) &\leadsto y\ (1, 0)+x\ (0, 1) = (y, x) \\
-\mathrm{d}(xy\mapsto\sin(xy)) &\leadsto \cos(xy)\ (y, x) \\
+\mathrm{d}(xy) &\leadsto y\ (1, 0)+x\ (0, 1) \\ &= (y, x) \\
+\mathrm{d}(\sin(xy)) &\leadsto \cos(xy)\ (y, x) \\
 &= (y\cos(xy), x\cos(xy))\\
-\mathrm{d}((x,\sin(xy))\mapsto x+\sin(xy)) &\leadsto 1\ (1\ 0) + 1\ (y\cos(xy)\ \ x\cos(xy)) \\
+\mathrm{d}(x+\sin(xy)) &\leadsto 1\ (1\ 0) + 1\ (y\cos(xy), x\cos(xy)) \\
 &= (1+y\cos(xy), x\cos(xy))\\
 \end{align}
 ```
@@ -304,7 +304,7 @@ Si l'on souhaite calculer une dérivée directionnelle, il est avantageux d'util
 ```math
 \nabla f\cdot d = \frac{d}{dt}(t\rightarrow f(X+t d))_{|t=0}
 ```
-En effet, la seule variable à definir de type `ADVar` est $t$.
+En effet, la seule variable de type `ADVar` est $t$, ce qui est très économique !
 
 **Note :** dans l'approche utilisant une "cassette" d'enregistrement, cette astuce n'a pas d'intérêt, car il suffit de prendre $v=d$ à la place de $v=e_i$.
 """
