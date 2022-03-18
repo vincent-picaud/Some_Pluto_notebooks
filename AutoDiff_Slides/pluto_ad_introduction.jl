@@ -272,7 +272,7 @@ J_{|x}=
 	\end{array}
 	\right)
 	```
-	- pour obtenir la ligne $i$ de $J$ il suffit de calculer $e_i^t J^t = J^t\cdot e_i$. Ceci permet de calculer la dérivée d'une seule grandeur par rapport à toutes les variables (cad une information de "type" gradient)
+	- pour obtenir la ligne $i$ de $J$ il suffit de calculer $e_i^t J = (J^t\cdot e_i)^t$. Ceci permet de calculer la dérivée d'une seule grandeur par rapport à toutes les variables (cad une information de "type" gradient)
 	```math
 	\left(
 	\begin{array}{ccc}
@@ -293,7 +293,6 @@ df_{|x}(\delta x) = \underbrace{\left( \partial_1 f_{|x}, \partial_2 f_{|x}, \do
 \langle \left( \begin{array}{c} \partial_1 f_{|x} \\ \partial_2 f_{|x} \\ \vdots \\ \partial_m f_{|x} \end{array}\right), \left( \begin{array}{c} \delta x_1 \\ \delta x_2 \\ \vdots \\ \delta x_m \end{array}\right) \rangle =
 \langle \nabla f_{|x}, \delta x \rangle 
 ```
-En particulier pour calculer le gradient, il suffit d'évaluer $J^t\cdot \mathbf{1}$
 
 !!! note "Au risque d'insister..."
     Le gradient est un **vecteur**, mais c'est une **ligne** de la Jacobienne.
@@ -306,9 +305,9 @@ md"""
 
 S'il ne faut en citer qu'une, alors c'est:
 
-Cartan, Henri, and Joseph Kouneiher. Cours de calcul différentiel. Paris: Hermann, 2007. 
+Cartan, Henri. Cours de calcul différentiel. Paris: Hermann, 2007. 
 
-Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1975).
+Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1977).
 """
 
 # ╔═╡ 286f2fe1-443e-430b-8549-fb65c2bc224d
@@ -994,9 +993,9 @@ md"""
 - Il est possible de faire des "cassettes" imbriquées pour calculer les dérivations d'ordre supérieur.
 
 Exemples de librairies:
-- [Mission Impossible C++](https://github.com/vincent-picaud/MissionImpossible)
-- [Stan](https://mc-stan.org/users/interfaces/math.html)
-- [Adept C++](https://github.com/rjhogan/Adept)
+- [Mission Impossible (C++, auto-promotion)](https://github.com/vincent-picaud/MissionImpossible)
+- [Stan (C++)](https://mc-stan.org/users/interfaces/math.html)
+- [Adept (C++)](https://github.com/rjhogan/Adept)
 
 ## Inconvénients
 - pour le mode forward on peut se passer d'enregistrer les opérations dans une "cassette", ce qui peut être plus efficace.
