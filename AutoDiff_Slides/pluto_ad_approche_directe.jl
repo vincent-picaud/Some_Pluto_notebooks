@@ -146,7 +146,7 @@ d(x+\sin(xy)) = (1+y\cos(xy))\mathrm{d}x + x\cos(xy)\mathrm{d}y
 	ce qui posserait un réel problème d'efficacité si l'on avait un grand nombre de variables indépendantes...
 
 !!! remark "Et les \"Dual numbers\"..."
-    L'approche précédente est simple et "directe". On peut recourir aux "dual 		numbers", pour faire exactement le même genre de calculs, mais la justification 	emmène beaucoup plus loin [Smooth infinitesimal analysis](https://en.wikipedia.org/wiki/Smooth_infinitesimal_analysis). L'idée est d'introduire un nombre $\epsilon$ tel que $\epsilon^2=0$, on a alors $f(a+\epsilon b)=f(a)+ϵf'(a)b$. C'est une réminiscence des infiniments petits de Leibniz où les termes d'ordre supérieur sont négligés $(dx)^2=0$. 
+    L'approche précédente est simple et "directe". On peut recourir aux "dual 		numbers", pour faire exactement le même genre de calculs, mais la justification 	emmène beaucoup plus loin [Smooth infinitesimal analysis](https://en.wikipedia.org/wiki/Smooth_infinitesimal_analysis). L'idée est d'introduire un nombre $\epsilon$ tel que $\epsilon^2=0$, on a alors $f(a+\epsilon)=f(a)+\epsilon f'(a)$. C'est une réminiscence des infiniments petits de Leibniz où les termes d'ordre supérieur sont négligés $(dx)^2=0$. 
 """
 
 # ╔═╡ 1989ee2c-3dfb-4fcd-862d-71c0f3a868d9
@@ -377,7 +377,7 @@ En effet, le théorème de Schwarz, nous dit que (si $f$ suffisament lisse) :
 ```math
 \partial^2_{ij}f = \partial^2_{ji}f
 ```
-Donc $1/2N(N-1)$ calculs sont redondants...
+Donc près de la moitié des calculs sont redondants...
 
 Il existe des approches, plus compliquées, qui évitent ces calculs inutiles :
 1. R.M. Gower, M.P. Mello, A new framework for the computation of hessians, Optimization Methods and Software. 27 (2012) 251-273. https://doi.org/10.1080/10556788.2011.580098.
@@ -623,13 +623,13 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─b1c123a1-acb6-4420-9cbc-a147eceb6a5a
 # ╟─84616b6d-f84a-49ef-8428-5c58ac04229a
 # ╠═53ad6cbd-700f-43dd-8bd7-5a641c75f164
-# ╠═f902c9a5-33c6-4eb1-87df-db12cd51a6fc
+# ╟─f902c9a5-33c6-4eb1-87df-db12cd51a6fc
 # ╠═464c0425-5db3-4264-9dd8-a88fbbb6d8c2
 # ╠═91cdf562-71bd-421d-bd84-215d74b42074
 # ╟─876461be-5460-4d5e-bf99-8428a0334aa9
 # ╠═d773e0db-d442-42aa-83ad-5e3865e2dbf3
 # ╟─59a17301-b59f-4602-b03d-7172ca123836
-# ╠═0cb422c6-0338-48df-bd3b-b78956e6bc3e
+# ╟─0cb422c6-0338-48df-bd3b-b78956e6bc3e
 # ╠═654963db-6487-49b3-b405-95a31b8d8668
 # ╠═93d0ef14-2b6e-4810-b520-a7008f8a9696
 # ╟─bc7a2576-1c57-41d8-aae3-0ca13a1a786a
@@ -643,6 +643,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═a7d99d50-c5ae-4139-8db7-67ff14f25cd1
 # ╠═b33ee2c2-01e0-4fad-8985-d96e5488c12c
 # ╟─7ba4ae91-1a00-4b27-b43a-46f4cd4c4739
-# ╟─fa1e4f38-a3c4-4178-9769-ca7d5491f8dd
+# ╠═fa1e4f38-a3c4-4178-9769-ca7d5491f8dd
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
