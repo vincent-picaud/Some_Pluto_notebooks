@@ -98,7 +98,7 @@ md"""
 ## Différentiation automatique
 
 Il y a principalement deux techniques pour mettre en ouvre la différentiation automatique :
-- **surcharge des opérateurs**
+- **surcharge des opérateurs** $\leftarrow$ l'objet de cette présentation
 - transformation du code source
 
 Il y a également deux modes de fonctionnement :
@@ -146,12 +146,12 @@ et
 ```
 
 ### Exemple 1
-On considère $g:x\mapsto \|x\|_2^2$. 
+On considère l'application norme euclidienne au carré $g:x\mapsto \|x\|^2$     
 
 Comme
 ```math
 \Large{
-\underbrace{\|x+\delta x\|_2^2}_{g(x+\delta x)} =  \underbrace{\|x\|_2^2}_{g(x)} + \underbrace{2 \langle  x,\delta x \rangle}_{dg_{|x}\cdot \delta x}  + \underbrace{\|\delta x\|_2^2}_{o(\|\delta x\|)}}
+\underbrace{\|x+\delta x\|^2}_{g(x+\delta x)} =  \underbrace{\|x\|^2}_{g(x)} + \underbrace{2 \langle  x,\delta x \rangle}_{dg_{|x}\cdot \delta x}  + \underbrace{\|\delta x\|^2}_{o(\|\delta x\|)}}
 ```
 
 La différentielle est donc :
@@ -194,9 +194,9 @@ Il s'agit de trouver la différentielle des fonctions composées
 
 ### Exemple
 
-On considère $x\mapsto h(x)=\| M\cdot x - y\|^2_2$. 
+On considère $x\mapsto h(x)=\| M\cdot x - y\|^2$. 
 
-Comme $h=g\circ f$ avec $g=\|.\|_2^2$ et $f=M\cdot . -y$, alors :
+Comme $h=g\circ f$ avec $g=\|.\|^2$ et $f=M\cdot . -y$, alors :
 
 ```math
 \Large{
@@ -218,7 +218,7 @@ md"""
 ## Gradient
 
 Contrairement à la différentielle, pour définir un gradient il faut un **produit scalaire** (espace de Hilbert). L'existence du gradient
-découle du théorème de représentation de Riesz, qui démontre que toute forme linéaire $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
+découle du théorème de représentation de Riesz, qui démontre que toute forme linéaire continue $\mathcal{l}$ alors il existe un vecteur $v$ tel que $l(x)=\langle v,x \rangle$.
 
 !!! definition "Vecteur gradient"
     Pour une fonction différentiable $f:\mathbb{R}^m\to\mathbb{R}$, la diffentielle  	en $x$, $df_{|x}$ est un élément de $\mathcal{L}(\mathbb{R}^m,\mathbb{R})$. C'est 	donc une forme linéaire. En utilisant Riesz, il existe donc un vecteur $v_x$ tel 		que :
@@ -307,7 +307,7 @@ S'il ne faut en citer qu'une, alors c'est:
 
 Cartan, Henri. Cours de calcul différentiel. Paris: Hermann, 2007. 
 
-Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1977).
+Il y a un deuxième tome sur le calcul différentiel extérieur...(ces deux parties sont regroupées dans l'édition de 1977). Tout ceci est valable dans un espace de Banach, bien pratique lorsqu'il faut faire du calcul variationel...
 """
 
 # ╔═╡ 286f2fe1-443e-430b-8549-fb65c2bc224d
@@ -335,7 +335,7 @@ x_2 \\
 x_1 x_2
 \end{array}
 \right)
-,\ 
+,\ \ \ 
 \Phi_2(x_1,x_2,x_3)=
 \left(
 \begin{array}{c}
@@ -345,7 +345,7 @@ x_3 \\
 \sin(x_3)
 \end{array}
 \right)
-,\ 
+,\ \ \ 
 \Phi_3(x_1,x_2,x_3,x_4)=
 \left(
 \begin{array}{c}
@@ -435,7 +435,7 @@ Pour calculer ce vecteur nous avons vu qu'il faut calculer $dF^t_{|(x_1,x_2)}\cd
 ```math
 \begin{align}
 dF^t_{|(x_1,x_2)}\cdot e_5 &= ((d\Phi_3)_{|\Phi_2(x_1,x_2,x_3)} \circ (d\Phi_2)_{|\Phi_1(x_1,x_2)} \circ (d\Phi_1)_{|(x_1,x_2)})^t \cdot e_5 \\
-&= (d\Phi_1)^t_{|(x_1,x_2)} \circ (d\Phi_2)^t_{|\Phi_2(x_1,x_2)} \circ(d\Phi_3)^t_{|\Phi_2(x_1,x_2,x_3)}  \cdot e_5
+&= (d\Phi_1)^t_{|(x_1,x_2)} \circ (d\Phi_2)^t_{|\Phi_1(x_1,x_2)} \circ(d\Phi_3)^t_{|\Phi_2(x_1,x_2,x_3)}  \cdot e_5
 \end{align}
 ```
 En explicitant les calculs :
@@ -785,7 +785,7 @@ end
 
 # ╔═╡ 63f891da-12ed-4813-be9e-b08cd6c274cb
 md"""
-Comme $d(x_i \times x_j)= x_jdx_i + x_idx_j$, alors:
+Comme $d(x_i \  x_j)= x_jdx_i + x_idx_j$, alors:
 """
 
 # ╔═╡ 89f2fecf-d07f-44e0-b39d-fbb6c509fbf6
@@ -1015,7 +1015,7 @@ double cblas_ddot (const int n,
 ```
 
 !!! note "Attention" 
-    La source du problème est que si l'on travaille au niveau "scalaire", les opérations matricielles ne bénificient plus de BLAS & LAPACK. Ceci conduit à une fort perte de performance.
+    La source du problème est que si l'on travaille au niveau "scalaire", les opérations matricielles ne bénificient plus de BLAS & LAPACK, car ce sont des AFloat64 qui sont stockés en mémoire et non des types primitifs tels que Float64. Ceci conduit à une fort perte de performance.
 """
 
 # ╔═╡ 2628ace2-b983-4c97-8598-e118675df304
@@ -1034,7 +1034,7 @@ end
 
 # ╔═╡ 2bd03e6a-1038-43bd-9065-17938b853374
 md"""
-On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'exécution.
+On trouve ici un facteur $(minimum(bench_autodiff_dot.times)/minimum(bench_blas_dot.times)) sur les temps d'exécution. Ce facteur est bien plus important pour des opérations entre matrices...
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2258,7 +2258,7 @@ version = "3.5.0+0"
 # ╟─63f891da-12ed-4813-be9e-b08cd6c274cb
 # ╠═89f2fecf-d07f-44e0-b39d-fbb6c509fbf6
 # ╟─295942c8-0ef5-4c1a-bf99-561e4b4597c1
-# ╠═d2011efa-d26c-4ed1-9688-bca52334c3bf
+# ╟─d2011efa-d26c-4ed1-9688-bca52334c3bf
 # ╠═423af97b-79ff-4fc8-8b67-26901b33ac50
 # ╟─a7c2573a-19a2-4d4b-91a1-116e6d1e7c6a
 # ╠═99173920-cb95-4a02-9d95-41cf04459183
