@@ -29,17 +29,17 @@ md"""
 
 # ╔═╡ a3c76871-a056-40b9-8d01-151546b5a7e0
 md"""
-## Rappel sur les $dx$, $dy$ etc...
+## Rappel sur les $\mathrm{d}x$, $\mathrm{d}y$ etc...
 
-On rappelle ici ce que représente $dx$, $dy$ etc... 
+On rappelle ici ce que représente $\mathrm{d}x$, $\mathrm{d}y$ etc... 
 
 Soient $X=\left(\begin{array}{c}a\\b\end{array}\right)\in\mathbb{R}^2$ et les 		applications coordonnées $\mathrm{p}^i$ : 
 
 ```math
-\mathrm{p}^1(X)=(1\  0)\cdot X
+\mathrm{p}^1(X)=(1\  0)\cdot X = a
 ```
 ```math
-\mathrm{p}^2(X)=(0\ 1)\cdot X
+\mathrm{p}^2(X)=(0\ 1)\cdot X = b
 ```
 **Remarque :** si l'on regroupe les $\mathrm{p}^i$, l'application $\mathrm{p}$ est simplement l'identité $\mathrm{p}=\mathrm{Id}$.
 
@@ -48,7 +48,7 @@ Ce sont des applications linéaires, donc :
 \mathrm{dp}^1=(1,\  0),\ \ \mathrm{dp}^2=(0,\ 1),\ \mathrm{dp}=\mathrm{Id}
 ```
 
-Si l'on considère $f:\mathbb{R}^2\rightarrow R$, alors :
+Si l'on considère $f:\mathbb{R}^2\rightarrow \mathbb{R}$, alors :
 ```math
 f(a,b)=f(\mathrm{p}^1(X),\mathrm{p}^2(X))=f\circ \mathrm{p}(X)
 ```
@@ -59,7 +59,7 @@ la règle de la chaine donne
 &= 
 \left(\begin{array}{cc}\partial_1 f & \partial_2 f \end{array}\right)\cdot \left(\begin{array}{cc}1 & 0 \\ 0 & 1 \end{array}\right) \cdot \delta X \\
     &= \partial_1 f\ \left(\begin{array}{cc}1 & 0 \end{array}\right) \cdot \delta X + \partial_2 f\ \left(\begin{array}{cc}0 & 1 \end{array}\right) \cdot \delta X \\
-    &= \partial_1 f\ \underbrace{\mathrm{dp}^1 \cdot \delta X}_{\mathrm{d}x} + \partial_2 f\ \underbrace{\mathrm{dp}^2 \cdot \delta X }_{\mathrm{d}y}
+    &= \partial_1 f\ \mathrm{dp}^1 \cdot \delta X + \partial_2 f\ \mathrm{dp}^2 \cdot \delta X
 \end{align}
 ```
 ce qui est traditionnellement noté 
@@ -88,9 +88,9 @@ Il suffit de regarder ce qu'il se passe pour $\Phi\circ\varphi$ où $\Phi:\mathb
 La règle de la chaine conduit à :
 ```math
 \begin{align}
-\mathrm{d}(\Phi\circ\varphi) &= \sum_{i=1}^m \partial_i (\Phi\circ\phi) \mathrm{d}^ix \\
-                 &= \sum_{i=1}^m \left(\sum_{j=1}^n \partial_j \Phi \partial_i \varphi^{\,j}\right) \mathrm{d}^ix \\
-&= \sum_{j=1}^n \partial_j \Phi \left(\sum_{i=1}^m  \partial_i \varphi^{\,j} \mathrm{d}^i x\right) \\
+\mathrm{d}(\Phi\circ\varphi) &= \sum_{i=1}^m \partial_i (\Phi\circ\phi) \mathrm{d}^i \\
+                 &= \sum_{i=1}^m \left(\sum_{j=1}^n \partial_j \Phi \partial_i \varphi^{\,j}\right) \mathrm{d}^i \\
+&= \sum_{j=1}^n \partial_j \Phi \left(\sum_{i=1}^m  \partial_i \varphi^{\,j} \mathrm{d}^i \right) \\
 &= \sum_{j=1}^n \partial_j \Phi\  \mathrm{d}\varphi^{\,j}
 \end{align}
 ```
@@ -643,6 +643,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═a7d99d50-c5ae-4139-8db7-67ff14f25cd1
 # ╠═b33ee2c2-01e0-4fad-8985-d96e5488c12c
 # ╟─7ba4ae91-1a00-4b27-b43a-46f4cd4c4739
-# ╠═fa1e4f38-a3c4-4178-9769-ca7d5491f8dd
+# ╟─fa1e4f38-a3c4-4178-9769-ca7d5491f8dd
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
