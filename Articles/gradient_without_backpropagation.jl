@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.18.1
+# v0.19.0
 
 using Markdown
 using InteractiveUtils
@@ -16,7 +16,7 @@ end
 md"""
 # Goal
 
-Reproduces some results of [Gradients without Backpropagation](https://arxiv.org/abs/2202.08587)
+Reproduces some results of [Gradients without Backpropagation, 17 Feb 2022](https://arxiv.org/abs/2202.08587)
 
 A simple idea that seems to work : 
 

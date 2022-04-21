@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.18.1
+# v0.19.0
 
 using Markdown
 using InteractiveUtils
@@ -40,7 +40,6 @@ Deux niveaux possibles :
   
   Exemple:
   - [Tapenade (C, Fortran)](http://www-tapenade.inria.fr:8080/tapenade/index.jsp) INRIA (subset of C, Fortran)
-  - [Clad (C++ subset)](https://github.com/vgvassilev/clad) développé par le Cern, agit au niveau AST du C++ (plugin clang)
 
 
 - adresser des languages de bas niveau, par exemple IR de LLVM. Avantage, structure du language plus simple, indépendance vis-à-vis du language initial. C'est à mon avis **la voix de l'avenir**.
@@ -48,9 +47,13 @@ Deux niveaux possibles :
   Examples:
   - [Enzyme (C++, Julia, Rust)](https://enzyme.mit.edu/)
   - [Zygote (Julia)](https://github.com/FluxML/Zygote.jl)
+  - [Diffractor.jl (Julia)](https://github.com/JuliaDiff/Diffractor.jl)
 
 Exemple de résultat obtenus par Enzyme:
 $(LocalResource("./all_top.png"))
+
+  Lecture/blog: 
+  - [Engineering Trade-Offs in Automatic Differentiation: from TensorFlow and PyTorch to Jax and Julia](http://www.stochasticlifestyle.com/engineering-trade-offs-in-automatic-differentiation-from-tensorflow-and-pytorch-to-jax-and-julia/)
 """
 
 # ╔═╡ 0cbd116a-fd38-4aea-b697-d50571d2afd9
